@@ -28,7 +28,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(nil, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -58,7 +58,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(&http.Client{}, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -77,14 +77,14 @@ func TestSend(t *testing.T) {
 	})
 
 	t.Run("send=invalid_token", func(t *testing.T) {
-		_, err := NewHTTPClient(nil, "", "")
+		_, err := NewClientWithHTTP(&http.Client{}, "", "")
 		if err == nil {
 			t.Fatal("expected error but got nil")
 		}
 	})
 
 	t.Run("send=invalid_message", func(t *testing.T) {
-		c, err := NewHTTPClient(nil, "test", "test")
+		c, err := NewClientWithHTTP(&http.Client{}, "test", "test")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -114,7 +114,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(&http.Client{}, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -154,7 +154,7 @@ func TestSendWithRetry(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(&http.Client{}, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -184,7 +184,7 @@ func TestSendWithRetry(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(&http.Client{}, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -229,7 +229,7 @@ func TestSendWithRetry(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewHTTPClient(nil, "test", server.URL)
+		client, err := NewClientWithHTTP(&http.Client{}, "test", server.URL)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -255,7 +255,7 @@ func TestSendWithRetry(t *testing.T) {
 	})
 
 	t.Run("send_with_retry=failure_retry", func(t *testing.T) {
-		client, err := NewHTTPClient(&http.Client{
+		client, err := NewClientWithHTTP(&http.Client{
 			Timeout: time.Nanosecond,
 		}, "test", "127.0.0.1:80")
 		if err != nil {

@@ -32,8 +32,8 @@ type HTTPClient struct {
 	endpoint string
 }
 
-// NewHTTPClient creates new HTTP FCM Client based on API key, endpoint and http client.
-func NewHTTPClient(httpClient *http.Client, apiKey, endpoint string) (*HTTPClient, error) {
+// NewClientWithHTTP creates new HTTP FCM Client based on API key, endpoint and http client.
+func NewClientWithHTTP(httpClient *http.Client, apiKey, endpoint string) (*HTTPClient, error) {
 	if httpClient == nil {
 		httpClient = &http.Client{}
 	}
@@ -48,6 +48,20 @@ func NewHTTPClient(httpClient *http.Client, apiKey, endpoint string) (*HTTPClien
 		apiKey:   apiKey,
 		endpoint: endpoint,
 		client:   httpClient,
+	}, nil
+}
+
+// NewClient creates new HTTP FCM Client based on API key and
+// with default endpoint and http client.
+func NewClient(apiKey string) (*HTTPClient, error) {
+	if apiKey == "" {
+		return nil, ErrInvalidAPIKey
+	}
+
+	return &HTTPClient{
+		apiKey:   apiKey,
+		endpoint: FCMEndpoint,
+		client:   &http.Client{},
 	}, nil
 }
 
