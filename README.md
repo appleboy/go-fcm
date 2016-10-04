@@ -41,13 +41,13 @@ func main() {
   	}
 
 	// Create a Sender to send the message.
-	client := fcm.NewHTTPClient("sample_api_key")
+	client := fcm.NewClient("sample_api_key")
 
 	// Send the message and receive the response without retries.
 	response, err := client.Send(msg)
 	if err != nil {
 		/* ... */
-    	}
+	}
 	/* ... */
 }
 ```
