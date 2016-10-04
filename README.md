@@ -34,11 +34,11 @@ import (
 func main() {
 	// Create the message to be sent.
 	msg := &gcm.Message{
-      Token: "sample_device_token",
-      Data: &fcm.Data{
-          "foo": "bar",
-      }
-  }
+     		Token: "sample_device_token",
+      		Data: &fcm.Data{
+         		"foo": "bar",
+      		}
+  	}
 
 	// Create a Sender to send the message.
 	client := fcm.NewHTTPClient("sample_api_key")
@@ -46,9 +46,8 @@ func main() {
 	// Send the message and receive the response without retries.
 	response, err := client.Send(msg)
 	if err != nil {
-    /* .... */
-  }
-
+		/* ... */
+    	}
 	/* ... */
 }
 ```
