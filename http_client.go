@@ -51,7 +51,7 @@ func NewHTTPClient(httpClient *http.Client, apiKey, endpoint string) (*HTTPClien
 	}, nil
 }
 
-// Send sends a message to the GCM server without retrying in case of
+// Send sends a message to the FCM server without retrying in case of
 // service unavailability. A non-nil error is returned if a non-recoverable
 // error occurs (i.e. if the response status is not "200 OK").
 func (c *HTTPClient) Send(msg *Message) (*Response, error) {
@@ -66,7 +66,7 @@ func (c *HTTPClient) Send(msg *Message) (*Response, error) {
 	return c.send(data)
 }
 
-// SendWithRetry sends a message to the GCM server with defined number of retrying
+// SendWithRetry sends a message to the FCM server with defined number of retrying
 // in case of temporary error.
 func (c *HTTPClient) SendWithRetry(msg *Message, retryAttempts int) (*Response, error) {
 	resp := new(Response)

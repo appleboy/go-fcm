@@ -86,7 +86,7 @@ func (serverError) Timeout() bool {
 	return false
 }
 
-// Response represents the GCM server's response to the application
+// Response represents the FCM server's response to the application
 // server's sent message.
 type Response struct {
 	MulticastID  int64    `json:"multicast_id"`
