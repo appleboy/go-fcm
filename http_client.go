@@ -27,9 +27,9 @@ var (
 // If the `HTTP` field is nil, a zeroed http.Client will be allocated and used
 // to send messages.
 type HTTPClient struct {
-	APIKey   string
-	HTTP     *http.Client
-	Endpoint string
+	apiKey   string
+	client   *http.Client
+	endpoint string
 }
 
 // NewHTTPClient creates new HTTP FCM Client based on API key, endpoint and http client.
@@ -45,9 +45,9 @@ func NewHTTPClient(httpClient *http.Client, apiKey, endpoint string) (*HTTPClien
 	}
 
 	return &HTTPClient{
-		APIKey:   apiKey,
-		Endpoint: endpoint,
-		HTTP:     httpClient,
+		apiKey:   apiKey,
+		endpoint: endpoint,
+		client:   httpClient,
 	}, nil
 }
 
@@ -82,14 +82,14 @@ func (c *HTTPClient) SendWithRetry(msg *Message, retryAttempts int) (*Response, 
 }
 
 func (c *HTTPClient) send(data []byte) (*Response, error) {
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", c.endpoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", fmt.Sprintf("key=%s", c.APIKey))
+	req.Header.Add("Authorization", fmt.Sprintf("key=%s", c.apiKey))
 	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := c.HTTP.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, connectionError(err.Error())
 	}
