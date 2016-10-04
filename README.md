@@ -40,7 +40,7 @@ func main() {
       		}
   	}
 
-	// Create a Sender to send the message.
+	// Create a FCM client to send the message.
 	client := fcm.NewClient("sample_api_key")
 
 	// Send the message and receive the response without retries.
