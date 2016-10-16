@@ -33,7 +33,7 @@ import (
 
 func main() {
 	// Create the message to be sent.
-	msg := &gcm.Message{
+	msg := &fcm.Message{
      		Token: "sample_device_token",
       		Data: &fcm.Data{
          		"foo": "bar",
