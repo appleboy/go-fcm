@@ -17,6 +17,7 @@ or `govendor`:
 ```bash
 govendor fetch github.com/edganiukov/fcm
 ```
+or other tool for vendoring.
 
 ### Sample Usage
 ----------------
