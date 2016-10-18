@@ -15,7 +15,7 @@ var (
 
 // Message represents list of targets, options, and payload for HTTP JSON messages.
 type Message struct {
-	Token                    string        `json:"to"`
+	Token                    string        `json:"to,omitempty"`
 	RegistrationIDs          []string      `json:"registration_ids,omitempty"`
 	Condition                string        `json:"condition,omitempty"`
 	CollapseKey              string        `json:"collapse_key,omitempty"`
@@ -54,7 +54,7 @@ func (msg *Message) Validate() error {
 	switch {
 	case msg == nil:
 		return ErrInvalidMessage
-	case msg.Token == "":
+	case msg.Token == "" && len(msg.RegistrationIDs) == 0:
 		return ErrInvalidToken
 	case len(msg.RegistrationIDs) > 1000:
 		return ErrToManyRegIDs
