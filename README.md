@@ -55,4 +55,4 @@ func main() {
 
 #### TODO:
 ---------
-- [ ] To retry only failed messages while multicast messaging.
+- [ ] Retry only failed messages while multicast messaging.
