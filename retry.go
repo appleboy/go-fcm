@@ -18,9 +18,11 @@ func retry(fn func() error, attempts int) error {
 		if err == nil {
 			return nil
 		}
+
 		if tErr, ok := err.(net.Error); !ok || !tErr.Temporary() {
 			return err
 		}
+
 		attempt++
 		backoff := minBackoff * time.Duration(attempt*attempt)
 		if attempt > attempts || backoff > maxBackoff {
