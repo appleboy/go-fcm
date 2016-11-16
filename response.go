@@ -8,37 +8,48 @@ import (
 var (
 	// ErrMissingRegistration occurs if registration token is not set.
 	ErrMissingRegistration = errors.New("missing registration token")
+
 	// ErrInvalidRegistration occurs if registration token is invalid.
 	ErrInvalidRegistration = errors.New("invalid registration token")
-	// ErrNotRegistered occurs when application was deleted from device
-	// and token is not registered in FCM.
+
+	// ErrNotRegistered occurs when application was deleted from device and
+	// token is not registered in FCM.
 	ErrNotRegistered = errors.New("unregistered device")
+
 	// ErrInvalidPackageName occurs if package name in message is invalid.
 	ErrInvalidPackageName = errors.New("invalid package name")
+
 	// ErrMismatchSenderID occurs when application has a new registration token.
 	ErrMismatchSenderID = errors.New("mismatched sender id")
+
 	// ErrMessageTooBig occurs when message is too big.
 	ErrMessageTooBig = errors.New("message is too big")
+
 	// ErrInvalidDataKey occurs if data key is invalid.
 	ErrInvalidDataKey = errors.New("invalid data key")
+
 	// ErrInvalidTTL occurs when message has invalid TTL.
 	ErrInvalidTTL = errors.New("invalid time to live")
-	// ErrUnavailable occurs when FCM service is unavailable.
-	//  It makes sense to retry after this error.
+
+	// ErrUnavailable occurs when FCM service is unavailable. It makes sense
+	// to retry after this error.
 	ErrUnavailable = connectionError("timeout")
-	// ErrInternalServerError is internal FCM error.
-	// It makes sense to retry after this error.
-	ErrInternalServerError = serverError("internal server error")
-	// ErrDeviceMessageRateExceeded occurs when client sent to many requests
-	// to the device.
+
+	// ErrInternalServerError is internal FCM error. It makes sense to retry
+	// after this error.
+	ErrInternalServerError = ServerError("internal server error")
+
+	// ErrDeviceMessageRateExceeded occurs when client sent to many requests to
+	// the device.
 	ErrDeviceMessageRateExceeded = errors.New("device message rate exceeded")
-	// ErrTopicsMessageRateExceeded occurs when client sent to many requests
-	// to the topics.
+
+	// ErrTopicsMessageRateExceeded occurs when client sent to many requests to
+	// the topics.
 	ErrTopicsMessageRateExceeded = errors.New("topics message rate exceeded")
 )
 
 var (
-	httpErrorsMapper = map[string]error{
+	errMap = map[string]error{
 		"MissingRegistration":       ErrMissingRegistration,
 		"InvalidRegistration":       ErrInvalidRegistration,
 		"NotRegistered":             ErrNotRegistered,
@@ -70,19 +81,19 @@ func (err connectionError) Timeout() bool {
 	return true
 }
 
-// serverError represents internal server errors.
+// ServerError represents internal server errors.
 // Implements `net.Error` interface.
-type serverError string
+type ServerError string
 
-func (err serverError) Error() string {
+func (err ServerError) Error() string {
 	return string(err)
 }
 
-func (serverError) Temporary() bool {
+func (ServerError) Temporary() bool {
 	return true
 }
 
-func (serverError) Timeout() bool {
+func (ServerError) Timeout() bool {
 	return false
 }
 
@@ -117,7 +128,8 @@ func (r *Result) UnmarshalJSON(data []byte) error {
 
 	r.MessageID = result.MessageID
 	r.RegistrationID = result.RegistrationID
-	r.Error = httpErrorsMapper[result.Error]
+	r.Error = errMap[result.Error]
+
 	return nil
 }
 
@@ -128,6 +140,7 @@ func (r Result) Unregistered() bool {
 	switch r.Error {
 	case ErrNotRegistered, ErrMismatchSenderID, ErrMissingRegistration, ErrInvalidRegistration:
 		return true
+
 	default:
 		return false
 	}

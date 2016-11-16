@@ -3,7 +3,7 @@ package fcm
 import "testing"
 
 func TestValidate(t *testing.T) {
-	t.Run("validaate=to_many_reg_ids", func(t *testing.T) {
+	t.Run("validate=to_many_reg_ids", func(t *testing.T) {
 		msg := &Message{
 			Token:           "test",
 			RegistrationIDs: []string{"reg_id"},
