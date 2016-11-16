@@ -127,7 +127,7 @@ func (c *Client) send(data []byte) (*Response, error) {
 	// check response status
 	if resp.StatusCode != http.StatusOK {
 		if resp.StatusCode >= http.StatusInternalServerError {
-			return nil, ServerError(fmt.Sprintf("%d error: %s", resp.StatusCode, resp.Status))
+			return nil, serverError(fmt.Sprintf("%d error: %s", resp.StatusCode, resp.Status))
 		}
 		return nil, fmt.Errorf("%d error: %s", resp.StatusCode, resp.Status)
 	}

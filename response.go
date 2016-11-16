@@ -37,7 +37,7 @@ var (
 
 	// ErrInternalServerError is internal FCM error. It makes sense to retry
 	// after this error.
-	ErrInternalServerError = ServerError("internal server error")
+	ErrInternalServerError = serverError("internal server error")
 
 	// ErrDeviceMessageRateExceeded occurs when client sent to many requests to
 	// the device.
@@ -81,19 +81,19 @@ func (err connectionError) Timeout() bool {
 	return true
 }
 
-// ServerError represents internal server errors.
+// serverError represents internal server errors.
 // Implements `net.Error` interface.
-type ServerError string
+type serverError string
 
-func (err ServerError) Error() string {
+func (err serverError) Error() string {
 	return string(err)
 }
 
-func (ServerError) Temporary() bool {
+func (serverError) Temporary() bool {
 	return true
 }
 
-func (ServerError) Timeout() bool {
+func (serverError) Timeout() bool {
 	return false
 }
 
