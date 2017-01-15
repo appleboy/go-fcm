@@ -92,10 +92,20 @@ func (c *Client) Send(msg *Message) (*Response, error) {
 // SendWithRetry sends a message to the FCM server with defined number of
 // retrying in case of temporary error.
 func (c *Client) SendWithRetry(msg *Message, retryAttempts int) (*Response, error) {
+	// validate
+	if err := msg.Validate(); err != nil {
+		return nil, err
+	}
+	// marshal message
+	data, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	resp := new(Response)
-	err := retry(func() error {
+	err = retry(func() error {
 		var err error
-		resp, err = c.Send(msg)
+		resp, err = c.send(data)
 		return err
 	}, retryAttempts)
 	if err != nil {
