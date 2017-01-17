@@ -27,9 +27,6 @@ Here is a simple example illustrating how to use FCM library:
 package main
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/edganiukov/fcm"
 )
 
