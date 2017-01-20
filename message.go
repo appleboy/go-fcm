@@ -9,7 +9,7 @@ var (
 	// ErrInvalidMessage occurs if push notitication message is nil.
 	ErrInvalidMessage = errors.New("message is invalid")
 
-	// ErrInvalidTarget occurs if nessage topic is empty.
+	// ErrInvalidTarget occurs if message topic is empty.
 	ErrInvalidTarget = errors.New("topic is invalid or registration ids are not set")
 
 	// ErrToManyRegIDs occurs when registration ids more then 1000.
