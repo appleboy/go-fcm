@@ -1,13 +1,16 @@
 package fcm
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 var (
 	// ErrInvalidMessage occurs if push notitication message is nil.
 	ErrInvalidMessage = errors.New("message is invalid")
 
-	// ErrInvalidToken occurs if device token is empty.
-	ErrInvalidToken = errors.New("device token is invalid")
+	// ErrInvalidTarget occurs if message topic is empty.
+	ErrInvalidTarget = errors.New("topic is invalid or registration ids are not set")
 
 	// ErrToManyRegIDs occurs when registration ids more then 1000.
 	ErrToManyRegIDs = errors.New("too many registrations ids")
@@ -52,20 +55,20 @@ type Message struct {
 
 // Validate returns an error if the message is not well-formed.
 func (msg *Message) Validate() error {
-	switch {
-	case msg == nil:
+	if msg == nil {
 		return ErrInvalidMessage
-
-	case msg.Token == "" && len(msg.RegistrationIDs) == 0:
-		return ErrInvalidToken
-
-	case len(msg.RegistrationIDs) > 1000:
-		return ErrToManyRegIDs
-
-	case msg.TimeToLive > 2419200:
-		return ErrInvalidTimeToLive
-
-	default:
-		return nil
 	}
+
+	// validate target identifier: `to` or `condition`, or `registration_ids`
+	opCnt := strings.Count(msg.Condition, "&&") + strings.Count(msg.Condition, "||")
+	if msg.Token == "" && (msg.Condition == "" || opCnt > 2) && len(msg.RegistrationIDs) == 0 {
+		return ErrInvalidTarget
+	}
+	if len(msg.RegistrationIDs) > 1000 {
+		return ErrToManyRegIDs
+	}
+	if msg.TimeToLive > 2419200 {
+		return ErrInvalidTimeToLive
+	}
+	return nil
 }
