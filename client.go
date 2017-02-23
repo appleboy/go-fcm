@@ -34,41 +34,22 @@ type Client struct {
 
 // NewClient creates new Firebase Cloud Messaging Client based on API key and
 // with default endpoint and http client.
-func NewClient(apiKey string) (*Client, error) {
+func NewClient(apiKey string, opts ...Option) (*Client, error) {
 	if apiKey == "" {
 		return nil, ErrInvalidAPIKey
 	}
-
-	return &Client{
+	c := &Client{
 		apiKey:   apiKey,
 		endpoint: DefaultEndpoint,
 		client:   &http.Client{},
-	}, nil
-}
-
-// NewClientFromHTTP creates a new Client based on API key, endpoint and http
-// client.
-func NewClientFromHTTP(c *http.Client, apiKey, endpoint string) (*Client, error) {
-	// check client
-	if c == nil {
-		c = &http.Client{}
+	}
+	for _, o := range opts {
+		if err := o(c); err != nil {
+			return nil, err
+		}
 	}
 
-	// check endpoint
-	if endpoint == "" {
-		endpoint = DefaultEndpoint
-	}
-
-	// check api key
-	if apiKey == "" {
-		return nil, ErrInvalidAPIKey
-	}
-
-	return &Client{
-		apiKey:   apiKey,
-		endpoint: endpoint,
-		client:   c,
-	}, nil
+	return c, nil
 }
 
 // Send sends a message to the FCM server without retrying in case of service
