@@ -42,7 +42,7 @@ func TestSend(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if resp.Success != 1 {
-			t.Fatalf("expected 1 sucesses\ngot: %d successes", resp.Success)
+			t.Fatalf("expected 1 successes\ngot: %d sucesses", resp.Success)
 		}
 		if resp.Failure != 0 {
 			t.Fatalf("expected 0 failures\ngot: %d failures", resp.Failure)
@@ -174,7 +174,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if resp.Success != 1 {
-			t.Fatalf("expected 1 sucesses\ngot: %d successes", resp.Success)
+			t.Fatalf("expected 1 successes\ngot: %d successes", resp.Success)
 		}
 		if resp.Failure != 0 {
 			t.Fatalf("expected 0 failures\ngot: %d failures", resp.Failure)
@@ -259,7 +259,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("expected 3 attempts\ngot: %d attempts", attempts)
 		}
 		if resp.Success != 1 {
-			t.Fatalf("expected 1 sucesses\ngot: %d successes", resp.Success)
+			t.Fatalf("expected 1 successes\ngot: %d successes", resp.Success)
 		}
 		if resp.Failure != 0 {
 			t.Fatalf("expected 0 failures\ngot: %d failures", resp.Failure)

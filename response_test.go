@@ -30,7 +30,7 @@ func TestUnmarshal(t *testing.T) {
 			Success:      0,
 			Failure:      1,
 			CanonicalIDs: 10,
-			Results: []Result{Result{
+			Results: []Result{{
 				MessageID:      "q1w2e3r4",
 				RegistrationID: "t5y6u7i8o9",
 				Error:          ErrNotRegistered,
