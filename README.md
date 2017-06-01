@@ -10,23 +10,26 @@ Golang client library for Firebase Cloud Messaging. Implemented only [HTTP clien
 
 More information on [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
 
-### Getting Started
--------------------
+## Getting Started
+
 To install fcm, use `go get`:
 
 ```bash
-go get github.com/edganiukov/fcm
+go get github.com/appleboy/go-fcm
 ```
+
 or `govendor`:
 
 ```bash
-govendor fetch github.com/edganiukov/fcm
+govendor fetch github.com/appleboy/go-fcm
 ```
+
 or other tool for vendoring.
 
-### Sample Usage
-----------------
+## Sample Usage
+
 Here is a simple example illustrating how to use FCM library:
+
 ```go
 package main
 
