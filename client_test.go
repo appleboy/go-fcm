@@ -33,7 +33,7 @@ func TestSend(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.Send(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -63,7 +63,7 @@ func TestSend(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.Send(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -122,7 +122,7 @@ func TestSend(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.Send(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -165,7 +165,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.SendWithRetry(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -198,7 +198,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.SendWithRetry(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -246,7 +246,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.SendWithRetry(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -278,7 +278,7 @@ func TestSendWithRetry(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.SendWithRetry(&Message{
-			Token: "test",
+			To: "test",
 			Data: map[string]interface{}{
 				"foo": "bar",
 			},

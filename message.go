@@ -39,16 +39,17 @@ type Notification struct {
 // Message represents list of targets, options, and payload for HTTP JSON
 // messages.
 type Message struct {
-	Token                    string                 `json:"to,omitempty"`
+	To                       string                 `json:"to,omitempty"`
 	RegistrationIDs          []string               `json:"registration_ids,omitempty"`
 	Condition                string                 `json:"condition,omitempty"`
 	CollapseKey              string                 `json:"collapse_key,omitempty"`
 	Priority                 string                 `json:"priority,omitempty"`
 	ContentAvailable         bool                   `json:"content_available,omitempty"`
 	DelayWhileIdle           bool                   `json:"delay_while_idle,omitempty"`
-	TimeToLive               int                    `json:"time_to_live,omitempty"`
+	TimeToLive               *uint                  `json:"time_to_live,omitempty"`
 	DeliveryReceiptRequested bool                   `json:"delivery_receipt_requested,omitempty"`
 	DryRun                   bool                   `json:"dry_run,omitempty"`
+	RestrictedPackageName    string                 `json:"restricted_package_name,omitempty"`
 	Notification             *Notification          `json:"notification,omitempty"`
 	Data                     map[string]interface{} `json:"data,omitempty"`
 }
@@ -61,13 +62,15 @@ func (msg *Message) Validate() error {
 
 	// validate target identifier: `to` or `condition`, or `registration_ids`
 	opCnt := strings.Count(msg.Condition, "&&") + strings.Count(msg.Condition, "||")
-	if msg.Token == "" && (msg.Condition == "" || opCnt > 2) && len(msg.RegistrationIDs) == 0 {
+	if msg.To == "" && (msg.Condition == "" || opCnt > 2) && len(msg.RegistrationIDs) == 0 {
 		return ErrInvalidTarget
 	}
+
 	if len(msg.RegistrationIDs) > 1000 {
 		return ErrToManyRegIDs
 	}
-	if msg.TimeToLive > 2419200 {
+
+	if msg.TimeToLive != nil && *msg.TimeToLive > uint(2419200) {
 		return ErrInvalidTimeToLive
 	}
 	return nil
