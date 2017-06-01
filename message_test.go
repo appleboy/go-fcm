@@ -4,9 +4,10 @@ import "testing"
 
 func TestValidate(t *testing.T) {
 	t.Run("valid with token", func(t *testing.T) {
+		timeToLive := uint(3600)
 		msg := &Message{
-			Token:      "test",
-			TimeToLive: 3600,
+			To:         "test",
+			TimeToLive: &timeToLive,
 			Data: map[string]interface{}{
 				"message": "This is a Firebase Cloud Messaging Topic Message!",
 			},
@@ -39,7 +40,7 @@ func TestValidate(t *testing.T) {
 
 	t.Run("too many registration ids", func(t *testing.T) {
 		msg := &Message{
-			Token:           "test",
+			To:              "test",
 			RegistrationIDs: make([]string, 2000),
 		}
 		err := msg.Validate()
@@ -49,10 +50,11 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("invalid TTL", func(t *testing.T) {
+		timeToLive := uint(2500000)
 		msg := &Message{
-			Token:           "test",
+			To:              "test",
 			RegistrationIDs: []string{"reg_id"},
-			TimeToLive:      2500000,
+			TimeToLive:      &timeToLive,
 			Data: map[string]interface{}{
 				"message": "This is a Firebase Cloud Messaging Topic Message!",
 			},
