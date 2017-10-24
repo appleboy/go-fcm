@@ -10,6 +10,12 @@ Golang client library for Firebase Cloud Messaging. Implemented only [HTTP clien
 
 More information on [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
 
+## Feature
+
+* [x] Send messages to a topic
+* [x] Send messages to a device list
+* [x] Supports condition attribute (fcm only)
+
 ## Getting Started
 
 To install fcm, use `go get`:
