@@ -75,7 +75,7 @@ func TestUnmarshal(t *testing.T) {
 
 	t.Run("Topic HTTP response", func(t *testing.T) {
 		data := []byte(`{
-  "message_id": "1023456",
+  "message_id": 1023456,
   "error": "TopicsMessageRateExceeded"
 }`)
 
@@ -85,7 +85,7 @@ func TestUnmarshal(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		expected := Response{
-			MessageID: "1023456",
+			MessageID: int64(1023456),
 			Error:     errMap["TopicsMessageRateExceeded"],
 		}
 		if !reflect.DeepEqual(response, expected) {
