@@ -105,6 +105,9 @@ type Response struct {
 	Failure      int      `json:"failure"`
 	CanonicalIDs int      `json:"canonical_ids"`
 	Results      []Result `json:"results"`
+
+	// Device Group HTTP Response
+	FailedRegistrationIDs []string `json:"failed_registration_ids"`
 }
 
 // Result represents the status of a processed message.
