@@ -1,8 +1,8 @@
 # go-fcm
 
-[![GoDoc](https://godoc.org/github.com/edganiukov/fcm?status.svg)](https://godoc.org/github.com/edganiukov/fcm)
-[![Build Status](https://travis-ci.org/edganiukov/fcm.svg?branch=master)](https://travis-ci.org/edganiukov/fcm)
-[![Go Report Card](https://goreportcard.com/badge/github.com/edganiukov/fcm)](https://goreportcard.com/report/github.com/edganiukov/fcm)
+[![GoDoc](https://godoc.org/github.com/appleboy/go-fcm?status.svg)](https://godoc.org/github.com/edganiukov/fcm)
+[![Build Status](https://travis-ci.org/appleboy/go-fcm.svg?branch=master)](https://travis-ci.org/edganiukov/fcm)
+[![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/edganiukov/fcm)
 
 This project was forked from [github.com/edganiukov/fcmfcm](https://github.com/edganiukov/fcm).
 
@@ -34,7 +34,7 @@ Here is a simple example illustrating how to use FCM library:
 package main
 
 import (
-	"github.com/edganiukov/fcm"
+	"github.com/appleboy/go-fcm"
 )
 
 func main() {
@@ -57,8 +57,3 @@ func main() {
 	/* ... */
 }
 ```
-
-
-#### TODO:
----------
-- [ ] Retry only failed messages while multicast messaging.
