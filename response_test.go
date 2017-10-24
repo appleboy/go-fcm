@@ -45,6 +45,34 @@ func TestUnmarshal(t *testing.T) {
 		}
 	})
 
+	t.Run("Device Group HTTP Response", func(t *testing.T) {
+		data := []byte(`{
+      "success":1,
+      "failure":2,
+      "failed_registration_ids":[
+        "regId1",
+        "regId2"
+      ]
+		}`)
+
+		var response Response
+		err := json.Unmarshal(data, &response)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		expected := Response{
+			Success: 1,
+			Failure: 2,
+			FailedRegistrationIDs: []string{
+				"regId1",
+				"regId2",
+			},
+		}
+		if !reflect.DeepEqual(response, expected) {
+			t.Fatalf("expected: %v\ngot: %v", expected, response)
+		}
+	})
+
 	t.Run("unmarshal=success_timeout", func(t *testing.T) {
 		data := []byte(`{
 			"multicast_id":10,
