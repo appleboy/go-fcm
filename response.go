@@ -116,7 +116,7 @@ type Response struct {
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (r *Response) UnmarshalJSON(data []byte) error {
-	var result struct {
+	var response struct {
 		MulticastID  int64    `json:"multicast_id"`
 		Success      int      `json:"success"`
 		Failure      int      `json:"failure"`
@@ -131,19 +131,19 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 		Error     string `json:"error"`
 	}
 
-	if err := json.Unmarshal(data, &result); err != nil {
+	if err := json.Unmarshal(data, &response); err != nil {
 		return err
 	}
 
-	r.MulticastID = result.MulticastID
-	r.Success = result.Success
-	r.Failure = result.Failure
-	r.CanonicalIDs = result.CanonicalIDs
-	r.Results = result.Results
-	r.Success = result.Success
-	r.FailedRegistrationIDs = result.FailedRegistrationIDs
-	r.MessageID = result.MessageID
-	r.Error = errMap[result.Error]
+	r.MulticastID = response.MulticastID
+	r.Success = response.Success
+	r.Failure = response.Failure
+	r.CanonicalIDs = response.CanonicalIDs
+	r.Results = response.Results
+	r.Success = response.Success
+	r.FailedRegistrationIDs = response.FailedRegistrationIDs
+	r.MessageID = response.MessageID
+	r.Error = errMap[response.Error]
 
 	return nil
 }
