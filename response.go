@@ -46,6 +46,9 @@ var (
 	// ErrTopicsMessageRateExceeded occurs when client sent to many requests to
 	// the topics.
 	ErrTopicsMessageRateExceeded = errors.New("topics message rate exceeded")
+
+	// ErrInvalidParameters occurs when provided parameters have the right name and type
+	ErrInvalidParameters = errors.New("check that the provided parameters have the right name and type")
 )
 
 var (
@@ -62,6 +65,7 @@ var (
 		"InternalServerError":       ErrInternalServerError,
 		"DeviceMessageRateExceeded": ErrDeviceMessageRateExceeded,
 		"TopicsMessageRateExceeded": ErrTopicsMessageRateExceeded,
+		"InvalidParameters":         ErrInvalidParameters,
 	}
 )
 
@@ -110,8 +114,8 @@ type Response struct {
 	FailedRegistrationIDs []string `json:"failed_registration_ids"`
 
 	// Topic HTTP response
-	MessageID string `json:"message_id"`
-	Error     error  `json:"error"`
+	MessageID int64 `json:"message_id"`
+	Error     error `json:"error"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -127,7 +131,7 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 		FailedRegistrationIDs []string `json:"failed_registration_ids"`
 
 		// Topic HTTP response
-		MessageID string `json:"message_id"`
+		MessageID int64  `json:"message_id"`
 		Error     string `json:"error"`
 	}
 
