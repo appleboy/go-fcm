@@ -28,7 +28,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer server.Close()
 
-		client, err := NewClient("test", WithEndpoint(server.URL))
+		client, err := NewClient("test", WithEndpoint(server.URL), WithTimeout(10*time.Second))
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
