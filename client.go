@@ -2,15 +2,20 @@ package fcm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 const (
 	// DefaultEndpoint contains endpoint URL of FCM service.
 	DefaultEndpoint = "https://fcm.googleapis.com/fcm/send"
+
+	// DefaultTimeout duration in second
+	DefaultTimeout time.Duration = 30 * time.Second
 )
 
 var (
@@ -30,6 +35,7 @@ type Client struct {
 	apiKey   string
 	client   *http.Client
 	endpoint string
+	timeout  time.Duration
 }
 
 // NewClient creates new Firebase Cloud Messaging Client based on API key and
@@ -42,6 +48,7 @@ func NewClient(apiKey string, opts ...Option) (*Client, error) {
 		apiKey:   apiKey,
 		endpoint: DefaultEndpoint,
 		client:   &http.Client{},
+		timeout:  DefaultTimeout,
 	}
 	for _, o := range opts {
 		if err := o(c); err != nil {
@@ -85,9 +92,9 @@ func (c *Client) SendWithRetry(msg *Message, retryAttempts int) (*Response, erro
 
 	resp := new(Response)
 	err = retry(func() error {
-		var err error
-		resp, err = c.send(data)
-		return err
+		var er error
+		resp, er = c.send(data)
+		return er
 	}, retryAttempts)
 	if err != nil {
 		return nil, err
@@ -103,6 +110,11 @@ func (c *Client) send(data []byte) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// request with timeout
+	ctx, cancel := context.WithTimeout(context.TODO(), c.timeout)
+	defer cancel()
+	req = req.WithContext(ctx)
 
 	// add headers
 	req.Header.Add("Authorization", fmt.Sprintf("key=%s", c.apiKey))
