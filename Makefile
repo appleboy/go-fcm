@@ -1,5 +1,3 @@
-.PHONY: test fmt vet errcheck lint
-
 GO ?= go
 PACKAGES ?= $(shell $(GO) list ./...)
 GOFILES := $(shell find . -name "*.go" -type f)
