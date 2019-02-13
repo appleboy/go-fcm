@@ -1,0 +1,41 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  pull: true
+  image: golang:1.11
+  commands:
+  - make vet
+  - make lint
+  - make test
+
+- name: codecov
+  pull: true
+  image: robertstettner/drone-codecov
+  settings:
+    files:
+    - coverage.out
+  environment:
+    CODECOV_TOKEN:
+      from_secret: codecov_token
+
+- name: discord
+  pull: true
+  image: appleboy/drone-discord
+  environment:
+    DISCORD_WEBHOOK_ID:
+      from_secret: discord_webhook_id
+    DISCORD_WEBHOOK_TOKEN:
+      from_secret: discord_webhook_token
+  when:
+    status:
+    - changed
+    - failure
+
+...
