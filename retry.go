@@ -8,7 +8,6 @@ import (
 const (
 	minBackoff = 100 * time.Millisecond
 	maxBackoff = 1 * time.Minute
-	factor     = 2.7
 )
 
 func retry(fn func() error, attempts int) error {
