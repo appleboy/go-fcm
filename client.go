@@ -74,7 +74,19 @@ func (c *Client) Send(msg *Message) (*Response, error) {
 		return nil, err
 	}
 
-	return c.send(data)
+	response, err := c.send(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Failure > 0 {
+		for i, res := range response.Results {
+			if res.Error == ErrNotRegistered || res.Error == ErrInvalidRegistration {
+				response.FailedRegistrationIDs = append(response.FailedRegistrationIDs, msg.RegistrationIDs[i])
+			}
+		}
+	}
+	return response, nil
 }
 
 // SendWithRetry sends a message to the FCM server with defined number of
