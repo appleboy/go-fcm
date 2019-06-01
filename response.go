@@ -52,6 +52,9 @@ var (
 
 	// ErrUnknown for unknown error type
 	ErrUnknown = errors.New("unknown error type")
+
+	// ErrInvalidApnsCredential for Invalid APNs credentials
+	ErrInvalidApnsCredential = errors.New("invalid APNs credentials")
 )
 
 var (
@@ -69,6 +72,7 @@ var (
 		"DeviceMessageRateExceeded": ErrDeviceMessageRateExceeded,
 		"TopicsMessageRateExceeded": ErrTopicsMessageRateExceeded,
 		"InvalidParameters":         ErrInvalidParameters,
+		"InvalidApnsCredential":     ErrInvalidApnsCredential,
 	}
 )
 
