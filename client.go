@@ -81,7 +81,7 @@ func (c *Client) Send(msg *Message) (*Response, error) {
 
 	if response.Failure > 0 {
 		for i, res := range response.Results {
-			if res.Error == ErrNotRegistered || res.Error == ErrInvalidRegistration {
+			if res.Error == ErrNotRegistered || res.Error == ErrInvalidRegistration || res.Error == ErrInvalidParameters {
 				response.FailedRegistrationIDs = append(response.FailedRegistrationIDs, msg.RegistrationIDs[i])
 			}
 		}
