@@ -59,6 +59,25 @@ func NewClient(apiKey string, opts ...Option) (*Client, error) {
 	return c, nil
 }
 
+// SendWithContext sends a message to the FCM server without retrying in case of service
+// unavailability. A non-nil error is returned if a non-recoverable error
+// occurs (i.e. if the response status is not "200 OK").
+// Behaves just like regular send, but uses external context.
+func (c *Client) SendWithContext(ctx context.Context, msg *Message) (*Response, error) {
+	// validate
+	if err := msg.Validate(); err != nil {
+		return nil, err
+	}
+
+	// marshal message
+	data, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.send(ctx, data)
+}
+
 // Send sends a message to the FCM server without retrying in case of service
 // unavailability. A non-nil error is returned if a non-recoverable error
 // occurs (i.e. if the response status is not "200 OK").
@@ -74,7 +93,9 @@ func (c *Client) Send(msg *Message) (*Response, error) {
 		return nil, err
 	}
 
-	return c.send(data)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+	return c.send(ctx, data)
 }
 
 // SendWithRetry sends a message to the FCM server with defined number of
@@ -92,8 +113,10 @@ func (c *Client) SendWithRetry(msg *Message, retryAttempts int) (*Response, erro
 
 	resp := new(Response)
 	err = retry(func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+		defer cancel()
 		var er error
-		resp, er = c.send(data)
+		resp, er = c.send(ctx, data)
 		return er
 	}, retryAttempts)
 	if err != nil {
@@ -104,16 +127,13 @@ func (c *Client) SendWithRetry(msg *Message, retryAttempts int) (*Response, erro
 }
 
 // send sends a request.
-func (c *Client) send(data []byte) (*Response, error) {
+func (c *Client) send(ctx context.Context, data []byte) (*Response, error) {
 	// create request
 	req, err := http.NewRequest("POST", c.endpoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
 
-	// request with timeout
-	ctx, cancel := context.WithTimeout(context.TODO(), c.timeout)
-	defer cancel()
 	req = req.WithContext(ctx)
 
 	// add headers
