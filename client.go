@@ -82,20 +82,10 @@ func (c *Client) SendWithContext(ctx context.Context, msg *Message) (*Response, 
 // unavailability. A non-nil error is returned if a non-recoverable error
 // occurs (i.e. if the response status is not "200 OK").
 func (c *Client) Send(msg *Message) (*Response, error) {
-	// validate
-	if err := msg.Validate(); err != nil {
-		return nil, err
-	}
-
-	// marshal message
-	data, err := json.Marshal(msg)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
-	return c.send(ctx, data)
+
+	return c.SendWithContext(ctx, msg)
 }
 
 // SendWithRetry sends a message to the FCM server with defined number of
