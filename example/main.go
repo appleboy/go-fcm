@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/appleboy/go-fcm"
+	"github.com/theromis/go-fcm"
 )
 
 func main() {
