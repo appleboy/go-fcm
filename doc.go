@@ -25,4 +25,4 @@
 // 	log.Printf("%#v\n", response)
 // }
 //
-package go-fcm
+package fcm
