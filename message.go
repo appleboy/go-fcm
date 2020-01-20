@@ -26,6 +26,7 @@ type Notification struct {
 	Body         string `json:"body,omitempty"`
 	ChannelID    string `json:"android_channel_id,omitempty"`
 	Icon         string `json:"icon,omitempty"`
+	Image        string `json:"image,omitempty"`
 	Sound        string `json:"sound,omitempty"`
 	Badge        string `json:"badge,omitempty"`
 	Tag          string `json:"tag,omitempty"`
@@ -54,6 +55,7 @@ type Message struct {
 	RestrictedPackageName    string                 `json:"restricted_package_name,omitempty"`
 	Notification             *Notification          `json:"notification,omitempty"`
 	Data                     map[string]interface{} `json:"data,omitempty"`
+	Apns                     map[string]interface{} `json:"apns,omitempty"`
 	Webpush                  map[string]interface{} `json:"webpush,omitempty"`
 }
 
