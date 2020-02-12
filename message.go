@@ -67,7 +67,7 @@ func (msg *Message) Validate() error {
 
 	// validate target identifier: `to` or `condition`, or `registration_ids`
 	opCnt := strings.Count(msg.Condition, "&&") + strings.Count(msg.Condition, "||")
-	if msg.To == "" && (msg.Condition == "" || opCnt > 2) && len(msg.RegistrationIDs) == 0 {
+	if msg.To == "" && (msg.Condition == "" || opCnt > 5) && len(msg.RegistrationIDs) == 0 {
 		return ErrInvalidTarget
 	}
 
