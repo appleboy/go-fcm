@@ -93,7 +93,7 @@ func TestValidate(t *testing.T) {
 
 	t.Run("invalid condition", func(t *testing.T) {
 		msg := &Message{
-			Condition: "'TopicA' in topics && ('TopicB' in topics || 'TopicC' in topics || 'TopicD' in topics )",
+			Condition: "'TopicA' in topics && ('TopicB' in topics || 'TopicC' in topics || 'TopicD' in topics || 'TopicE' in topics || 'TopicF' in topics)",
 			Data: map[string]interface{}{
 				"message": "This is a Firebase Cloud Messaging Topic Message!",
 			},
