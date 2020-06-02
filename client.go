@@ -97,7 +97,7 @@ func (c *Client) SendWithRetry(msg *Message, retryAttempts int) (*Response, erro
 // SendWithRetryWithContext sends a message to the FCM server with defined number of
 // retrying in case of temporary error.
 // Behaves just like regular SendWithRetry, but uses external context.
-func (c *Client) SendWithRetryWithContext(ctx context.Context, msg *Message, retryAttempts int)  (*Response, error) {
+func (c *Client) SendWithRetryWithContext(ctx context.Context, msg *Message, retryAttempts int) (*Response, error) {
 	// validate
 	if err := msg.Validate(); err != nil {
 		return nil, err
