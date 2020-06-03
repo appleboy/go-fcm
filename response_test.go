@@ -31,9 +31,10 @@ func TestUnmarshal(t *testing.T) {
 			Failure:      1,
 			CanonicalIDs: 10,
 			Results: []Result{{
-				MessageID:      "q1w2e3r4",
-				RegistrationID: "t5y6u7i8o9",
-				Error:          ErrNotRegistered,
+				MessageID:         "q1w2e3r4",
+				RegistrationID:    "t5y6u7i8o9",
+				Error:             ErrNotRegistered,
+				ErrorResponseCode: "NotRegistered",
 			}},
 		}
 		if !reflect.DeepEqual(response, expected) {
@@ -85,8 +86,9 @@ func TestUnmarshal(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		expected := Response{
-			MessageID: int64(1023456),
-			Error:     errMap["TopicsMessageRateExceeded"],
+			MessageID:         int64(1023456),
+			Error:             errMap["TopicsMessageRateExceeded"],
+			ErrorResponseCode: "TopicsMessageRateExceeded",
 		}
 		if !reflect.DeepEqual(response, expected) {
 			t.Fatalf("expected: %v\ngot: %v", expected, response)

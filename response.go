@@ -121,8 +121,9 @@ type Response struct {
 	FailedRegistrationIDs []string `json:"failed_registration_ids"`
 
 	// Topic HTTP response
-	MessageID int64 `json:"message_id"`
-	Error     error `json:"error"`
+	MessageID         int64 `json:"message_id"`
+	Error             error `json:"error"`
+	ErrorResponseCode string
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -154,6 +155,7 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 	r.Success = response.Success
 	r.FailedRegistrationIDs = response.FailedRegistrationIDs
 	r.MessageID = response.MessageID
+	r.ErrorResponseCode = response.Error
 	if response.Error != "" {
 		if val, ok := errMap[response.Error]; ok {
 			r.Error = val
@@ -167,9 +169,10 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 
 // Result represents the status of a processed message.
 type Result struct {
-	MessageID      string `json:"message_id"`
-	RegistrationID string `json:"registration_id"`
-	Error          error  `json:"error"`
+	MessageID         string `json:"message_id"`
+	RegistrationID    string `json:"registration_id"`
+	Error             error  `json:"error"`
+	ErrorResponseCode string
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
@@ -186,6 +189,7 @@ func (r *Result) UnmarshalJSON(data []byte) error {
 
 	r.MessageID = result.MessageID
 	r.RegistrationID = result.RegistrationID
+	r.ErrorResponseCode = result.Error
 	if result.Error != "" {
 		if val, ok := errMap[result.Error]; ok {
 			r.Error = val
