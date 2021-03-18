@@ -152,7 +152,6 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 	r.Failure = response.Failure
 	r.CanonicalIDs = response.CanonicalIDs
 	r.Results = response.Results
-	r.Success = response.Success
 	r.FailedRegistrationIDs = response.FailedRegistrationIDs
 	r.MessageID = response.MessageID
 	r.ErrorResponseCode = response.Error
