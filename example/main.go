@@ -13,6 +13,10 @@ func main() {
 		Data: map[string]interface{}{
 			"foo": "bar",
 		},
+		Notification: &fcm.Notification {
+			Title: "title",
+			Body: "body"
+		},
 	}
 
 	// Create a FCM client to send the message.
