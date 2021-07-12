@@ -13,9 +13,9 @@ func main() {
 		Data: map[string]interface{}{
 			"foo": "bar",
 		},
-		Notification: &fcm.Notification {
+		Notification: &fcm.Notification{
 			Title: "title",
-			Body: "body"
+			Body: "body",
 		},
 	}
 
