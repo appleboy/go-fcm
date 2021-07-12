@@ -15,7 +15,7 @@ func main() {
 		},
 		Notification: &fcm.Notification{
 			Title: "title",
-			Body: "body",
+			Body:  "body",
 		},
 	}
 
