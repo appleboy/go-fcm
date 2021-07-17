@@ -9,7 +9,7 @@ platform:
 steps:
 - name: test
   pull: true
-  image: golang:1.15
+  image: golang:1.16
   commands:
   - make vet
   - make lint
