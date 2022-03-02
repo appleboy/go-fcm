@@ -41,22 +41,20 @@ type Notification struct {
 // Message represents list of targets, options, and payload for HTTP JSON
 // messages.
 type Message struct {
-	To                       string                 `json:"to,omitempty"`
-	RegistrationIDs          []string               `json:"registration_ids,omitempty"`
-	Condition                string                 `json:"condition,omitempty"`
-	CollapseKey              string                 `json:"collapse_key,omitempty"`
-	Priority                 string                 `json:"priority,omitempty"`
-	ContentAvailable         bool                   `json:"content_available,omitempty"`
-	MutableContent           bool                   `json:"mutable_content,omitempty"`
-	DelayWhileIdle           bool                   `json:"delay_while_idle,omitempty"`
-	TimeToLive               *uint                  `json:"time_to_live,omitempty"`
-	DeliveryReceiptRequested bool                   `json:"delivery_receipt_requested,omitempty"`
-	DryRun                   bool                   `json:"dry_run,omitempty"`
-	RestrictedPackageName    string                 `json:"restricted_package_name,omitempty"`
-	Notification             *Notification          `json:"notification,omitempty"`
-	Data                     map[string]interface{} `json:"data,omitempty"`
-	Apns                     map[string]interface{} `json:"apns,omitempty"`
-	Webpush                  map[string]interface{} `json:"webpush,omitempty"`
+	To                    string                 `json:"to,omitempty"`
+	RegistrationIDs       []string               `json:"registration_ids,omitempty"`
+	Condition             string                 `json:"condition,omitempty"`
+	CollapseKey           string                 `json:"collapse_key,omitempty"`
+	Priority              string                 `json:"priority,omitempty"`
+	ContentAvailable      bool                   `json:"content_available,omitempty"`
+	MutableContent        bool                   `json:"mutable_content,omitempty"`
+	TimeToLive            *uint                  `json:"time_to_live,omitempty"`
+	DryRun                bool                   `json:"dry_run,omitempty"`
+	RestrictedPackageName string                 `json:"restricted_package_name,omitempty"`
+	Notification          *Notification          `json:"notification,omitempty"`
+	Data                  map[string]interface{} `json:"data,omitempty"`
+	Apns                  map[string]interface{} `json:"apns,omitempty"`
+	Webpush               map[string]interface{} `json:"webpush,omitempty"`
 }
 
 // Validate returns an error if the message is not well-formed.
