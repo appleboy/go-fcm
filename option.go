@@ -3,6 +3,7 @@ package fcm
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -35,6 +36,18 @@ func WithTimeout(d time.Duration) Option {
 			return errors.New("invalid timeout duration")
 		}
 		c.timeout = d
+		return nil
+	}
+}
+
+// WithHTTPProxy returns Option to configure HTTP Client proxy.
+func WithHTTPProxy(proxyURL string) Option {
+	return func(c *Client) error {
+		proxy, err := url.Parse(proxyURL)
+		if err != nil {
+			return err
+		}
+		c.client.Transport.(*http.Transport).Proxy = http.ProxyURL(proxy)
 		return nil
 	}
 }
