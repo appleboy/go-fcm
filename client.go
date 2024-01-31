@@ -18,10 +18,8 @@ const (
 	DefaultTimeout time.Duration = 30 * time.Second
 )
 
-var (
-	// ErrInvalidAPIKey occurs if API key is not set.
-	ErrInvalidAPIKey = errors.New("client API Key is invalid")
-)
+// ErrInvalidAPIKey occurs if API key is not set.
+var ErrInvalidAPIKey = errors.New("client API Key is invalid")
 
 // Client abstracts the interaction between the application server and the
 // FCM server via HTTP protocol. The developer must obtain an API key from the
@@ -47,7 +45,7 @@ func NewClient(apiKey string, opts ...Option) (*Client, error) {
 	c := &Client{
 		apiKey:   apiKey,
 		endpoint: DefaultEndpoint,
-		client:   &http.Client{},
+		client:   http.DefaultClient,
 		timeout:  DefaultTimeout,
 	}
 	for _, o := range opts {
