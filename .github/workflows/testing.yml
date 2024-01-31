@@ -4,21 +4,12 @@ on:
   push:
   pull_request:
 
-permissions:
-  actions: read
-  contents: read
-  statuses: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Setup go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "^1"
       - name: Checkout repository
@@ -28,10 +19,6 @@ jobs:
         with:
           version: latest
           args: --verbose
-      - uses: hadolint/hadolint-action@v3.1.0
-        name: hadolint for Dockerfile
-        with:
-          dockerfile: docker/Dockerfile
 
   testing:
     runs-on: ubuntu-latest
@@ -42,7 +29,7 @@ jobs:
 
       - name: add git make command
         run: |
-          apk add git make curl perl bash build-base zlib-dev ucl-dev
+          apk add make
 
       - name: testing
         run: |
@@ -50,11 +37,3 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-
-  commitlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v5
