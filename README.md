@@ -24,8 +24,6 @@ To install fcm, use `go get`:
 go get github.com/appleboy/go-fcm
 ```
 
-or other tool for vendoring.
-
 ## Sample Usage
 
 Here is a simple example illustrating how to use FCM library:
