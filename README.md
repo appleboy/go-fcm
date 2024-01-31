@@ -1,7 +1,7 @@
 # go-fcm
 
 [![GoDoc](https://godoc.org/github.com/appleboy/go-fcm?status.svg)](https://godoc.org/github.com/appleboy/go-fcm)
-[![Build Status](https://cloud.drone.io/api/badges/appleboy/go-fcm/status.svg)](https://cloud.drone.io/appleboy/go-fcm)
+[![Lint and Testing](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/appleboy/go-fcmm)
 
 This project was forked from [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm).
@@ -24,12 +24,6 @@ To install fcm, use `go get`:
 go get github.com/appleboy/go-fcm
 ```
 
-or `govendor`:
-
-```bash
-govendor fetch github.com/appleboy/go-fcm
-```
-
 or other tool for vendoring.
 
 ## Sample Usage
@@ -40,36 +34,36 @@ Here is a simple example illustrating how to use FCM library:
 package main
 
 import (
-	"log"
+  "log"
 
-	"github.com/appleboy/go-fcm"
+  "github.com/appleboy/go-fcm"
 )
 
 func main() {
-	// Create the message to be sent.
-	msg := &fcm.Message{
-		To: "sample_device_token",
-		Data: map[string]interface{}{
-			"foo": "bar",
-		},
-		Notification: &fcm.Notification{
-			Title: "title",
-			Body: "body",
-		},
-	}
+  // Create the message to be sent.
+  msg := &fcm.Message{
+    To: "sample_device_token",
+    Data: map[string]interface{}{
+      "foo": "bar",
+    },
+    Notification: &fcm.Notification{
+      Title: "title",
+      Body: "body",
+    },
+  }
 
-	// Create a FCM client to send the message.
-	client, err := fcm.NewClient("sample_api_key")
-	if err != nil {
-		log.Fatalln(err)
-	}
+  // Create a FCM client to send the message.
+  client, err := fcm.NewClient("sample_api_key")
+  if err != nil {
+    log.Fatalln(err)
+  }
 
-	// Send the message and receive the response without retries.
-	response, err := client.Send(msg)
-	if err != nil {
-		log.Fatalln(err)
-	}
+  // Send the message and receive the response without retries.
+  response, err := client.Send(msg)
+  if err != nil {
+    log.Fatalln(err)
+  }
 
-	log.Printf("%#v\n", response)
+  log.Printf("%#v\n", response)
 }
 ```
