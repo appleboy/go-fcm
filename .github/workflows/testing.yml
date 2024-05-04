@@ -15,14 +15,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v5
         with:
           version: latest
           args: --verbose
 
   testing:
     runs-on: ubuntu-latest
-    container: golang:1.21-alpine
+    container: golang:1.22-alpine
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,4 +36,4 @@ jobs:
           make test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
