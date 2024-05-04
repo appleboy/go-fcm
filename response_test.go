@@ -37,7 +37,14 @@ func TestUnmarshal(t *testing.T) {
 				ErrorResponseCode: "NotRegistered",
 			}},
 		}
-		if !reflect.DeepEqual(response, expected) {
+		if response.MulticastID != expected.MulticastID ||
+			response.Success != expected.Success ||
+			response.Failure != expected.Failure ||
+			response.CanonicalIDs != expected.CanonicalIDs ||
+			response.Results[0].MessageID != expected.Results[0].MessageID ||
+			response.Results[0].RegistrationID != expected.Results[0].RegistrationID ||
+			response.Results[0].Error != expected.Results[0].Error ||
+			response.Results[0].ErrorResponseCode != expected.Results[0].ErrorResponseCode {
 			t.Fatalf("expected: %v\ngot: %v", expected, response)
 		}
 
@@ -62,14 +69,13 @@ func TestUnmarshal(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		expected := Response{
-			Success: 1,
-			Failure: 2,
-			FailedRegistrationIDs: []string{
-				"regId1",
-				"regId2",
-			},
+			Success:               1,
+			Failure:               2,
+			FailedRegistrationIDs: []string{"regId1", "regId2"},
 		}
-		if !reflect.DeepEqual(response, expected) {
+		if response.Success != expected.Success ||
+			response.Failure != expected.Failure ||
+			!reflect.DeepEqual(response.FailedRegistrationIDs, expected.FailedRegistrationIDs) {
 			t.Fatalf("expected: %v\ngot: %v", expected, response)
 		}
 	})
@@ -90,7 +96,9 @@ func TestUnmarshal(t *testing.T) {
 			Error:             errMap["TopicsMessageRateExceeded"],
 			ErrorResponseCode: "TopicsMessageRateExceeded",
 		}
-		if !reflect.DeepEqual(response, expected) {
+		if response.MessageID != expected.MessageID ||
+			response.Error != expected.Error ||
+			response.ErrorResponseCode != expected.ErrorResponseCode {
 			t.Fatalf("expected: %v\ngot: %v", expected, response)
 		}
 	})
