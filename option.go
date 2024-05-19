@@ -52,3 +52,13 @@ func WithCredentialsFile(filename string) Option {
 		return nil
 	}
 }
+
+// WithCredentialsJSON returns a ClientOption that authenticates
+// API calls with the given service account or refresh token JSON
+// credentials.
+func WithCredentialsJSON(json []byte) Option {
+	return func(c *Client) error {
+		c.options = append(c.options, option.WithCredentialsJSON(json))
+		return nil
+	}
+}
