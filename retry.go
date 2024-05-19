@@ -18,7 +18,7 @@ func retry(fn func() error, attempts int) error {
 			return nil
 		}
 
-		if tErr, ok := err.(net.Error); !ok || !tErr.Temporary() {
+		if _, ok := err.(net.Error); !ok {
 			return err
 		}
 
