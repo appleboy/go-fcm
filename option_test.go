@@ -10,7 +10,7 @@ func TestWithHTTPProxy(t *testing.T) {
 	proxyURL := "http://example.com/proxy"
 
 	c := &Client{
-		client: &http.Client{
+		httpClient: &http.Client{
 			Transport: &http.Transport{},
 		},
 	}
@@ -20,7 +20,7 @@ func TestWithHTTPProxy(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	transport := c.client.Transport.(*http.Transport)
+	transport := c.httpClient.Transport.(*http.Transport)
 	req := &http.Request{
 		URL: &url.URL{
 			Scheme: "https",

@@ -5,26 +5,17 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"google.golang.org/api/option"
 )
 
 // Option configurates Client with defined option.
 type Option func(*Client) error
 
-// WithEndpoint returns Option to configure FCM Endpoint.
-func WithEndpoint(endpoint string) Option {
-	return func(c *Client) error {
-		if endpoint == "" {
-			return errors.New("invalid endpoint")
-		}
-		c.endpoint = endpoint
-		return nil
-	}
-}
-
 // WithHTTPClient returns Option to configure HTTP Client.
 func WithHTTPClient(httpClient *http.Client) Option {
 	return func(c *Client) error {
-		c.client = httpClient
+		c.httpClient = httpClient
 		return nil
 	}
 }
@@ -47,7 +38,17 @@ func WithHTTPProxy(proxyURL string) Option {
 		if err != nil {
 			return err
 		}
-		c.client.Transport.(*http.Transport).Proxy = http.ProxyURL(proxy)
+		c.httpClient.Transport.(*http.Transport).Proxy = http.ProxyURL(proxy)
+		return nil
+	}
+}
+
+// WithCredentialsFile returns a ClientOption that authenticates
+// API calls with the given service account or refresh token JSON
+// credentials file.
+func WithCredentialsFile(filename string) Option {
+	return func(c *Client) error {
+		c.options = append(c.options, option.WithCredentialsFile(filename))
 		return nil
 	}
 }
