@@ -101,3 +101,27 @@ func (c *Client) SendMulticastDryRun(ctx context.Context, message *messaging.Mul
 
 	return resp, nil
 }
+
+// SubscribeToTopic subscribes a list of registration tokens to a topic.
+//
+// The tokens list must not be empty, and have at most 1000 tokens.
+func (c *Client) SubscribeTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+	resp, err := c.client.SubscribeToTopic(ctx, tokens, topic)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+// UnsubscribeFromTopic unsubscribes a list of registration tokens from a topic.
+//
+// The tokens list must not be empty, and have at most 1000 tokens.
+func (c *Client) UnsubscribeTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+	resp, err := c.client.UnsubscribeFromTopic(ctx, tokens, topic)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
