@@ -20,17 +20,16 @@ func (ts *MockTokenSource) Token() (*oauth2.Token, error) {
 	return &oauth2.Token{AccessToken: ts.AccessToken}, nil
 }
 
-func TestSend(t *testing.T) {
-	t.Run("send and send dry run success", func(t *testing.T) {
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"name": "q1w2e3r4"
-			}`))
-		}))
-		defer server.Close()
-
+func TestSendEach(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+      "name": "q1w2e3r4"
+    }`))
+	}))
+	defer server.Close()
+	t.Run("send each and send each dry run success", func(t *testing.T) {
 		client, err := NewClient(
 			context.Background(),
 			WithEndpoint(server.URL),
@@ -57,6 +56,65 @@ func TestSend(t *testing.T) {
 			context.Background(),
 			&messaging.Message{
 				Token: "test",
+				Data: map[string]string{
+					"foo": "bar",
+				},
+			})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+	})
+
+	t.Run("missing multicast message", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "12345-token"}),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.SendMulticast(
+			context.Background(),
+			nil,
+		)
+		if err == nil {
+			t.Fatalf("expected error\n got: %v", err)
+		}
+		if resp != nil {
+			t.Fatalf("expected nil response\ngot: %v", resp)
+		}
+	})
+
+	t.Run("send multicast and send multicast dry run success", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "12345-token"}),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.SendMulticast(
+			context.Background(),
+			&messaging.MulticastMessage{
+				Tokens: []string{"test01"},
+				Data: map[string]string{
+					"foo": "bar",
+				},
+			})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+
+		resp, err = client.SendMulticastDryRun(
+			context.Background(),
+			&messaging.MulticastMessage{
+				Tokens: []string{"test01"},
 				Data: map[string]string{
 					"foo": "bar",
 				},
