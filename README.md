@@ -6,15 +6,14 @@
 
 This project was forked from [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm).
 
-Golang client library for Firebase Cloud Messaging. Implemented only [HTTP client](https://firebase.google.com/docs/cloud-messaging/http-server-ref#downstream).
-
 More information on [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
 
 ## Feature
 
+* [x] Send messages to a single device
+* [x] Send messages to a multiple devices
 * [x] Send messages to a topic
-* [x] Send messages to a device list
-* [x] Supports condition attribute (fcm only)
+* [x] Supports condition attribute
 
 ## Getting Started
 
@@ -32,36 +31,41 @@ Here is a simple example illustrating how to use FCM library:
 package main
 
 import (
+  "context"
+  "fmt"
   "log"
 
-  "github.com/appleboy/go-fcm"
+  "firebase.google.com/go/v4/messaging"
+  fcm "github.com/appleboy/go-fcm"
 )
 
 func main() {
-  // Create the message to be sent.
-  msg := &fcm.Message{
-    To: "sample_device_token",
-    Data: map[string]interface{}{
-      "foo": "bar",
-    },
-    Notification: &fcm.Notification{
-      Title: "title",
-      Body: "body",
-    },
-  }
-
-  // Create a FCM client to send the message.
-  client, err := fcm.NewClient("sample_api_key")
+  client, err := fcm.NewClient(
+    context.Background(),
+    fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
+  )
   if err != nil {
-    log.Fatalln(err)
+    log.Fatal(err)
   }
 
-  // Send the message and receive the response without retries.
-  response, err := client.Send(msg)
+  // Send to a single device
+  token := "test"
+  resp, err := client.Send(
+    context.Background(),
+    &messaging.Message{
+      Token: token,
+      Data: map[string]string{
+        "foo": "bar",
+      },
+    },
+  )
   if err != nil {
-    log.Fatalln(err)
+    log.Fatal(err)
   }
 
-  log.Printf("%#v\n", response)
+  fmt.Println("success count:", resp.SuccessCount)
+  fmt.Println("failure count:", resp.FailureCount)
+  fmt.Println("message id:", resp.Responses[0].MessageID)
+  fmt.Println("error msg:", resp.Responses[0].Error)
 }
 ```
