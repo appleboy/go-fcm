@@ -24,6 +24,7 @@ import (
 type Client struct {
 	client        *messaging.Client
 	serviceAcount string
+	projectID     string
 	options       []option.ClientOption
 }
 
@@ -42,6 +43,13 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 		conf = &firebase.Config{
 			ServiceAccountID: c.serviceAcount,
 		}
+	}
+
+	if c.projectID != "" {
+		if conf == nil {
+			conf = &firebase.Config{}
+		}
+		conf.ProjectID = c.projectID
 	}
 
 	app, err := firebase.NewApp(ctx, conf, c.options...)
