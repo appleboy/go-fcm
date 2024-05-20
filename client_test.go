@@ -21,7 +21,7 @@ func (ts *MockTokenSource) Token() (*oauth2.Token, error) {
 }
 
 func TestSend(t *testing.T) {
-	t.Run("send=success", func(t *testing.T) {
+	t.Run("send and send dry run success", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -41,6 +41,19 @@ func TestSend(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.Send(
+			context.Background(),
+			&messaging.Message{
+				Token: "test",
+				Data: map[string]string{
+					"foo": "bar",
+				},
+			})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+
+		resp, err = client.SendDryRun(
 			context.Background(),
 			&messaging.Message{
 				Token: "test",
