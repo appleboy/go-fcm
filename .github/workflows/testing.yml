@@ -21,19 +21,44 @@ jobs:
           args: --verbose
 
   testing:
-    runs-on: ubuntu-latest
-    container: golang:1.22-alpine
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: [1.21, 1.22]
+        include:
+          - os: ubuntu-latest
+            go-build: ~/.cache/go-build
+          - os: macos-latest
+            go-build: ~/Library/Caches/go-build
+    name: ${{ matrix.os }} @ Go ${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+    env:
+      GO111MODULE: on
+      GOPROXY: https://proxy.golang.org
     steps:
-      - name: Checkout repository
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
-      - name: add git make command
-        run: |
-          apk add make
-
-      - name: testing
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ${{ matrix.go-build }}
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Run Tests
         run: |
           make test
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
+        with:
+          flags: ${{ matrix.os }},go-${{ matrix.go }}
