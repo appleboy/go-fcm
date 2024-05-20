@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 )
 
@@ -68,6 +69,39 @@ func WithCustomClientOption(opts ...option.ClientOption) Option {
 			return nil
 		}
 		c.options = append(c.options, opts...)
+		return nil
+	}
+}
+
+// WithEndpoint returns Option to configure endpoint.
+func WithEndpoint(endpoint string) Option {
+	return func(c *Client) error {
+		c.options = append(c.options, option.WithEndpoint(endpoint))
+		return nil
+	}
+}
+
+// WithServiceAccount returns Option to configure service account.
+func WithServiceAccount(serviceAccount string) Option {
+	return func(c *Client) error {
+		c.serviceAcount = serviceAccount
+		return nil
+	}
+}
+
+// WithProjectID returns Option to configure project ID.
+func WithProjectID(projectID string) Option {
+	return func(c *Client) error {
+		c.projectID = projectID
+		return nil
+	}
+}
+
+// WithTokenSource returns a ClientOption that specifies an OAuth2 token
+// source to be used as the basis for authentication.
+func WithTokenSource(s oauth2.TokenSource) Option {
+	return func(c *Client) error {
+		c.options = append(c.options, option.WithTokenSource(s))
 		return nil
 	}
 }
