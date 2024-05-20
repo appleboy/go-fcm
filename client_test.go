@@ -51,11 +51,15 @@ func TestSend(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if resp.SuccessCount != 1 {
-			t.Fatalf("expected 1 successes\ngot: %d sucesses", resp.SuccessCount)
-		}
-		if resp.FailureCount != 0 {
-			t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)
-		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
 	})
+}
+
+func checkSuccessfulBatchResponseForSendEach(t *testing.T, resp *messaging.BatchResponse) {
+	if resp.SuccessCount != 1 {
+		t.Fatalf("expected 1 successes\ngot: %d sucesses", resp.SuccessCount)
+	}
+	if resp.FailureCount != 0 {
+		t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)
+	}
 }
