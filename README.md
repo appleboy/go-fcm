@@ -167,5 +167,4 @@ func main() {
     fmt.Printf("List of tokens that caused failures: %v\n", failedTokens)
   }
 }
-}
 ```
