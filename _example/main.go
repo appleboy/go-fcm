@@ -10,8 +10,9 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
 	client, err := fcm.NewClient(
-		context.Background(),
+		ctx,
 		fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
 	)
 	if err != nil {
@@ -21,7 +22,7 @@ func main() {
 	// Send to a single device
 	token := "test"
 	resp, err := client.Send(
-		context.Background(),
+		ctx,
 		&messaging.Message{
 			Token: token,
 			Data: map[string]string{
@@ -40,7 +41,7 @@ func main() {
 
 	// Send to topic
 	resp, err = client.Send(
-		context.Background(),
+		ctx,
 		&messaging.Message{
 			Data: map[string]string{
 				"foo": "bar",
@@ -67,7 +68,7 @@ func main() {
 	}
 
 	resp, err = client.Send(
-		context.Background(),
+		ctx,
 		message,
 	)
 	if err != nil {
@@ -94,7 +95,7 @@ func main() {
 		},
 	}
 	resp, err = client.Send(
-		context.Background(),
+		ctx,
 		messages...,
 	)
 	if err != nil {
@@ -117,7 +118,7 @@ func main() {
 		Tokens: registrationTokens,
 	}
 	resp, err = client.SendMulticast(
-		context.Background(),
+		ctx,
 		msg,
 	)
 	if err != nil {
