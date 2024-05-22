@@ -23,6 +23,25 @@ To install fcm, use `go get`:
 go get github.com/appleboy/go-fcm
 ```
 
+## Provide credentials using ADC
+
+Google Application Default Credentials (ADC) for Firebase projects support Google service accounts, which you can use to call Firebase server APIs from your app server or trusted environment. If you're developing code locally or deploying your application on-premises, you can use credentials obtained via this service account to authorize server requests.
+
+To authenticate a service account and authorize it to access Firebase services, you must generate a private key file in JSON format.
+
+**To generate a private key file for your service account:**
+
+1. In the Firebase console, open **Settings > [Service Accounts][11]**.
+2. Click **Generate New Private Key**, then confirm by clicking **Generate Key**.
+3. Securely store the JSON file containing the key.
+
+When authorizing via a service account, you have two choices for providing the credentials to your application. You can either set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable, or you can explicitly pass the path to the service account key in code. The first option is more secure and is strongly recommended.
+
+See the more detail information [here][12].
+
+[11]: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
+[12]: https://firebase.google.com/docs/cloud-messaging/auth-server#provide-credentials-using-adc
+
 ## Sample Usage
 
 Here is a simple example illustrating how to use FCM library:
