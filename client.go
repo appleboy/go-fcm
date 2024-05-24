@@ -39,17 +39,11 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	}
 
 	var conf *firebase.Config
-	if c.serviceAcount != "" {
+	if c.serviceAcount != "" || c.projectID != "" {
 		conf = &firebase.Config{
 			ServiceAccountID: c.serviceAcount,
+			ProjectID:        c.projectID,
 		}
-	}
-
-	if c.projectID != "" {
-		if conf == nil {
-			conf = &firebase.Config{}
-		}
-		conf.ProjectID = c.projectID
 	}
 
 	app, err := firebase.NewApp(ctx, conf, c.options...)
