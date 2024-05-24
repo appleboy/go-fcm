@@ -14,6 +14,8 @@ func main() {
 	client, err := fcm.NewClient(
 		ctx,
 		fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
+		// initial with service account
+		// fcm.WithServiceAccount("my-client-id@my-project-id.iam.gserviceaccount.com"),
 	)
 	if err != nil {
 		log.Fatal(err)
