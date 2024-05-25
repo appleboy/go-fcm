@@ -42,7 +42,7 @@ See the more detail information [here][12].
 [11]: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
 [12]: https://firebase.google.com/docs/cloud-messaging/auth-server#provide-credentials-using-adc
 
-## Sample Usage
+## Usage
 
 Here is a simple example illustrating how to use FCM library:
 
@@ -188,5 +188,49 @@ func main() {
 
     fmt.Printf("List of tokens that caused failures: %v\n", failedTokens)
   }
+}
+```
+
+### Custom HTTP Client
+
+You can use a custom HTTP client by passing it to the `NewClient` function:
+
+```go
+func main() {
+  httpTimeout := time.Duration(5) * time.Second
+  tlsTimeout := time.Duration(5) * time.Second
+
+  transport := &http2.Transport{
+    DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+      return tls.DialWithDialer(&net.Dialer{Timeout: tlsTimeout}, network, addr, cfg)
+    },
+  }
+
+  httpClient := &http.Client{
+    Transport: transport,
+    Timeout:   httpTimeout,
+  }
+
+  ctx := context.Background()
+  client, err := fcm.NewClient(
+    ctx,
+    fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
+    fcm.WithHTTPClient(httpClient),
+  )
+}
+```
+
+### Custom Proxy Server
+
+You can use a custom proxy server by passing it to the `NewClient` function:
+
+```go
+func main() {
+  ctx := context.Background()
+  client, err := fcm.NewClient(
+    ctx,
+    fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
+    fcm.WithHTTPProxy("http://localhost:8088"),
+  )
 }
 ```
