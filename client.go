@@ -8,8 +8,8 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
-	"google.golang.org/api/transport"
 )
 
 var scopes = []string{
@@ -30,11 +30,12 @@ var scopes = []string{
 // - https://www.googleapis.com/auth/firebase.messaging
 // - https://www.googleapis.com/auth/cloud-platform
 type Client struct {
-	client        *messaging.Client
-	serviceAcount string
-	projectID     string
-	options       []option.ClientOption
-	httpClient    *http.Client
+	client          *messaging.Client
+	serviceAcount   string
+	projectID       string
+	options         []option.ClientOption
+	httpClient      *http.Client
+	credentialsJSON []byte // credentialsJSON is the JSON representation of the service account credentials.
 }
 
 // NewClient creates new Firebase Cloud Messaging Client based on API key and
@@ -57,8 +58,8 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	}
 
 	if c.httpClient != nil {
-		c.options = append(c.options, option.WithScopes(scopes...))
-		creds, err := transport.Creds(ctx, c.options...)
+		ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, c.httpClient)
+		creds, err := google.CredentialsFromJSON(ctxWithClient, c.credentialsJSON, scopes...)
 		if err != nil {
 			return nil, err
 		}

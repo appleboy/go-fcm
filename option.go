@@ -1,8 +1,10 @@
 package fcm
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
@@ -39,7 +41,12 @@ func WithHTTPProxy(proxyURL string) Option {
 // credentials file.
 func WithCredentialsFile(filename string) Option {
 	return func(c *Client) error {
-		c.options = append(c.options, option.WithCredentialsFile(filename))
+		data, err := os.ReadFile(filename)
+		if err != nil {
+			return fmt.Errorf("cannot read credentials file: %v", err)
+		}
+		c.credentialsJSON = data
+		c.options = append(c.options, option.WithCredentialsJSON(data))
 		return nil
 	}
 }
@@ -47,9 +54,10 @@ func WithCredentialsFile(filename string) Option {
 // WithCredentialsJSON returns a ClientOption that authenticates
 // API calls with the given service account or refresh token JSON
 // credentials.
-func WithCredentialsJSON(json []byte) Option {
+func WithCredentialsJSON(data []byte) Option {
 	return func(c *Client) error {
-		c.options = append(c.options, option.WithCredentialsJSON(json))
+		c.credentialsJSON = data
+		c.options = append(c.options, option.WithCredentialsJSON(data))
 		return nil
 	}
 }
