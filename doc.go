@@ -3,26 +3,36 @@
 // Here is a simple example illustrating how to use FCM library:
 //
 //	func main() {
-//		// Create the message to be sent.
-//		msg := &fcm.Message{
-//			To: "sample_device_token",
-//			Data: map[string]interface{}{
-//				"foo": "bar",
-//			},
-//		}
-//
-//		// Create a FCM client to send the message.
-//		client, err := fcm.NewClient("sample_api_key")
+//		ctx := context.Background()
+//		client, err := fcm.NewClient(
+//			ctx,
+//			fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
+//		)
 //		if err != nil {
-//			log.Fatalln(err)
+//			log.Fatal(err)
 //		}
 //
-//		// Send the message and receive the response without retries.
-//		response, err := client.Send(msg)
+//	// Send to a single device
+//	token := "test"
+//	resp, err := client.Send(
+//
+//	ctx,
+//	&messaging.Message{
+//		Token: token,
+//		Data: map[string]string{
+//			"foo": "bar",
+//		},
+//	},
+//
+// )
+//
 //		if err != nil {
-//			log.Fatalln(err)
+//			log.Fatal(err)
 //		}
 //
-//		log.Printf("%#v\n", response)
+//		fmt.Println("success count:", resp.SuccessCount)
+//		fmt.Println("failure count:", resp.FailureCount)
+//		fmt.Println("message id:", resp.Responses[0].MessageID)
+//		fmt.Println("error msg:", resp.Responses[0].Error)
 //	}
 package fcm
