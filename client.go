@@ -36,6 +36,7 @@ type Client struct {
 	options         []option.ClientOption
 	httpClient      *http.Client
 	credentialsJSON []byte // credentialsJSON is the JSON representation of the service account credentials.
+	debug           bool
 }
 
 // NewClient creates new Firebase Cloud Messaging Client based on API key and
@@ -54,6 +55,20 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 		conf = &firebase.Config{
 			ServiceAccountID: c.serviceAcount,
 			ProjectID:        c.projectID,
+		}
+	}
+
+	if c.debug {
+		if c.httpClient == nil {
+			c.httpClient = &http.Client{
+				Transport: debugTransport{
+					t: http.DefaultTransport,
+				},
+			}
+		} else {
+			c.httpClient.Transport = debugTransport{
+				t: c.httpClient.Transport,
+			}
 		}
 	}
 
