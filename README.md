@@ -1,6 +1,6 @@
 # go-fcm
 
-[![GoDoc](https://godoc.org/github.com/appleboy/go-fcm?status.svg)](https://godoc.org/github.com/appleboy/go-fcm)
+[![GoDoc](https://pkg.go.dev/badge/github.com/appleboy/go-fcm)](https://pkg.go.dev/github.com/appleboy/go-fcm)
 [![Lint and Testing](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/appleboy/go-fcmm)
 
