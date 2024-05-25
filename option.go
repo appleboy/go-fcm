@@ -14,7 +14,7 @@ type Option func(*Client) error
 // WithHTTPClient returns Option to configure HTTP Client.
 func WithHTTPClient(httpClient *http.Client) Option {
 	return func(c *Client) error {
-		c.options = append(c.options, option.WithHTTPClient(httpClient))
+		c.httpClient = httpClient
 		return nil
 	}
 }

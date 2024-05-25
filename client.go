@@ -2,11 +2,19 @@ package fcm
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
+	"google.golang.org/api/transport"
 )
+
+var scopes = []string{
+	"https://www.googleapis.com/auth/firebase.messaging",
+}
 
 // Client abstracts the interaction between the application server and the
 // FCM server via HTTP protocol. The developer must obtain an API key from the
@@ -26,11 +34,13 @@ type Client struct {
 	serviceAcount string
 	projectID     string
 	options       []option.ClientOption
+	httpClient    *http.Client
 }
 
 // NewClient creates new Firebase Cloud Messaging Client based on API key and
 // with default endpoint and http client.
 func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
+	var err error
 	c := &Client{}
 	for _, o := range opts {
 		if err := o(c); err != nil {
@@ -44,6 +54,26 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 			ServiceAccountID: c.serviceAcount,
 			ProjectID:        c.projectID,
 		}
+	}
+
+	if c.httpClient != nil {
+		c.options = append(c.options, option.WithScopes(scopes...))
+		creds, err := transport.Creds(ctx, c.options...)
+		if err != nil {
+			return nil, err
+		}
+
+		// And this is how we insert proxy for the Firebase calls. Initialize base transport with our proxy.
+		tr := &oauth2.Transport{
+			Source: creds.TokenSource,
+			Base:   c.httpClient.Transport,
+		}
+
+		hCl := &http.Client{
+			Transport: tr,
+			Timeout:   10 * time.Second,
+		}
+		c.options = append(c.options, option.WithHTTPClient(hCl))
 	}
 
 	app, err := firebase.NewApp(ctx, conf, c.options...)
