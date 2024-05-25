@@ -54,26 +54,6 @@ func WithCredentialsJSON(json []byte) Option {
 	}
 }
 
-// WithCustomClientOption is an option function that allows you to provide custom client options.
-// It appends the provided custom options to the client's options list.
-// The custom options are applied when sending requests to the FCM server.
-// If no custom options are provided, this function does nothing.
-//
-// Parameters:
-//   - opts: The custom client options to be appended to the client's options list.
-//
-// Returns:
-//   - An error if there was an issue appending the custom options to the client's options list, or nil otherwise.
-func WithCustomClientOption(opts ...option.ClientOption) Option {
-	return func(c *Client) error {
-		if len(opts) == 0 {
-			return nil
-		}
-		c.options = append(c.options, opts...)
-		return nil
-	}
-}
-
 // WithEndpoint returns Option to configure endpoint.
 func WithEndpoint(endpoint string) Option {
 	return func(c *Client) error {
