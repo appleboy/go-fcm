@@ -22,13 +22,14 @@ func WithHTTPClient(httpClient *http.Client) Option {
 // WithHTTPProxy returns Option to configure HTTP Client proxy.
 func WithHTTPProxy(proxyURL string) Option {
 	return func(c *Client) error {
-		httpClient := http.DefaultClient
 		proxy, err := url.Parse(proxyURL)
 		if err != nil {
 			return err
 		}
-		httpClient.Transport.(*http.Transport).Proxy = http.ProxyURL(proxy)
-		c.options = append(c.options, option.WithHTTPClient(httpClient))
+		httpClient := &http.Client{
+			Transport: &http.Transport{Proxy: http.ProxyURL(proxy)},
+		}
+		c.httpClient = httpClient
 		return nil
 	}
 }
