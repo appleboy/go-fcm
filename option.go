@@ -94,3 +94,11 @@ func WithTokenSource(s oauth2.TokenSource) Option {
 		return nil
 	}
 }
+
+// WithDebug returns Option to configure debug mode.
+func WithDebug(debug bool) Option {
+	return func(c *Client) error {
+		c.debug = debug
+		return nil
+	}
+}
