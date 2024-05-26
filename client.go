@@ -28,7 +28,6 @@ var scopes = []string{
 // Authorization Scopes
 // Requires one of the following OAuth scopes:
 // - https://www.googleapis.com/auth/firebase.messaging
-// - https://www.googleapis.com/auth/cloud-platform
 type Client struct {
 	client          *messaging.Client
 	serviceAcount   string
