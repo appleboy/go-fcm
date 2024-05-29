@@ -234,3 +234,62 @@ func main() {
   )
 }
 ```
+
+### Mock Client for Testing
+
+You can use a mock client for Unit Testing by initializing your `NewClient` with the following:
+- `fcm.WithEndpoint` with a local `httptest.NewServer` URL, 
+- `fcm.WithProjectID` any string
+- `fcm.WithServiceAccount` any string
+- `fcm.WithCustomClientOption` with option `option.WithoutAuthentication()` 
+
+```go
+package main
+
+import (
+	"context"
+	"firebase.google.com/go/v4/messaging"
+	"github.com/appleboy/go-fcm"
+	"google.golang.org/api/option"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func mockGoogleClient(url string) *fcm.Client {
+ client, err := fcm.NewClient(context.Background(),
+  fcm.WithEndpoint(url),
+  fcm.WithProjectID("test-project-id"),
+  fcm.WithServiceAccount("test-service-account"),
+  fcm.WithCustomClientOption(option.WithoutAuthentication()))
+
+ if err != nil {
+  panic("could not initialize client")
+ }
+
+ return client
+}
+
+func Test_sendGoogleNotification_Success(t *testing.T) {
+ server := httptest.NewServer(http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+  responseWriter.WriteHeader(http.StatusOK)
+  responseWriter.Write([]byte(`{"name":"0:1458740347772099%768429ab0000006d"}`))
+ }))
+
+ defer server.Close()
+
+ client := mockGoogleClient(server.URL)
+
+ msg:= &messaging.Message{
+   Token: "token",
+   Data: map[string]string{
+      "foo": "bar",
+   },
+ }
+ _, err := sendGoogleNotification(client, msg)
+
+ if err != nil {
+  t.Error(err)
+ }
+}
+```
