@@ -8,6 +8,7 @@ import (
 
 	"firebase.google.com/go/v4/messaging"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
 )
 
 // MockTokenSource is a TokenSource implementation that can be used for testing.
@@ -115,6 +116,30 @@ func TestSendEach(t *testing.T) {
 			context.Background(),
 			&messaging.MulticastMessage{
 				Tokens: []string{"test01"},
+				Data: map[string]string{
+					"foo": "bar",
+				},
+			})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+	})
+
+	t.Run("send message without token using custom client option", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithCustomClientOption(option.WithoutAuthentication()),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.Send(
+			context.Background(),
+			&messaging.Message{
+				Token: "test",
 				Data: map[string]string{
 					"foo": "bar",
 				},
