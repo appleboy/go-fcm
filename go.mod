@@ -5,11 +5,11 @@ go 1.21
 require (
 	firebase.google.com/go/v4 v4.14.0
 	golang.org/x/oauth2 v0.20.0
-	google.golang.org/api v0.181.0
+	google.golang.org/api v0.182.0
 )
 
 require (
-	cloud.google.com/go v0.113.0 // indirect
+	cloud.google.com/go v0.114.0 // indirect
 	cloud.google.com/go/auth v0.4.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
@@ -43,7 +43,7 @@ require (
 	google.golang.org/appengine/v2 v2.0.6 // indirect
 	google.golang.org/genproto v0.0.0-20240520151616-dc85e6b867a5 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240520151616-dc85e6b867a5 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240520151616-dc85e6b867a5 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240521202816-d264139d666e // indirect
 	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 )
