@@ -5,7 +5,7 @@ go 1.21
 require (
 	firebase.google.com/go/v4 v4.14.1
 	golang.org/x/oauth2 v0.21.0
-	google.golang.org/api v0.183.0
+	google.golang.org/api v0.184.0
 )
 
 require (
