@@ -1,10 +1,11 @@
 module github.com/appleboy/go-fcm
 
 go 1.22.7
+toolchain go1.23.6
 
 require (
 	firebase.google.com/go/v4 v4.15.1
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.215.0
 )
 
