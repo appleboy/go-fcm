@@ -24,7 +24,9 @@ func (d debugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	respDump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
-		resp.Body.Close()
+		if cerr := resp.Body.Close(); cerr != nil {
+			log.Printf("error closing response body: %v", cerr)
+		}
 		return nil, err
 	}
 	log.Printf("%s", respDump)
