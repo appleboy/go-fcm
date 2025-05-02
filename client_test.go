@@ -153,7 +153,7 @@ func TestSendEach(t *testing.T) {
 
 func checkSuccessfulBatchResponseForSendEach(t *testing.T, resp *messaging.BatchResponse) {
 	if resp.SuccessCount != 1 {
-		t.Fatalf("expected 1 successes\ngot: %d sucesses", resp.SuccessCount)
+		t.Fatalf("expected 1 successes\ngot: %d successes", resp.SuccessCount)
 	}
 	if resp.FailureCount != 0 {
 		t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)

@@ -17,7 +17,7 @@ jobs:
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.0
           args: --verbose
 
       # This step uses the Bearer GitHub Action to scan for sensitive data in the codebase.
