@@ -2,49 +2,86 @@
 
 [![GoDoc](https://pkg.go.dev/badge/github.com/appleboy/go-fcm)](https://pkg.go.dev/github.com/appleboy/go-fcm)
 [![Lint and Testing](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/appleboy/go-fcmm)
+[![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/appleboy/go-fcm)
 
-This project was forked from [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm).
+> Forked from [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm)  
+> [Firebase Cloud Messaging Official Documentation](https://firebase.google.com/docs/cloud-messaging/)
 
-More information on [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
+---
 
-## Feature
+## Table of Contents
 
-* [x] Send messages to a single device
-* [x] Send messages to a multiple devices
-* [x] Send messages to a topic
-* [x] Supports condition attribute
+- [go-fcm](#go-fcm)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Supported Message Types](#supported-message-types)
+  - [Quick Start](#quick-start)
+  - [Authentication and Credentials](#authentication-and-credentials)
+  - [Usage Example](#usage-example)
+  - [Advanced Configuration](#advanced-configuration)
+    - [Custom HTTP Client](#custom-http-client)
+    - [Proxy Support](#proxy-support)
+    - [Unit Testing and Mock](#unit-testing-and-mock)
+  - [Best Practices](#best-practices)
+  - [Troubleshooting](#troubleshooting)
+  - [Architecture Diagram](#architecture-diagram)
+  - [FAQ](#faq)
+  - [License](#license)
 
-## Getting Started
+---
 
-To install fcm, use `go get`:
+## Features
+
+| Feature                   | Supported | Description                                 |
+| ------------------------- | :-------: | ------------------------------------------- |
+| Single Device Messaging   |    ✅     | Send messages to a single device            |
+| Multiple Device Messaging |    ✅     | Send messages to multiple devices           |
+| Topic Messaging           |    ✅     | Send messages to a specific topic           |
+| Condition Messaging       |    ✅     | Support for FCM condition syntax            |
+| Custom HTTP Client        |    ✅     | Custom timeout, proxy, and transport config |
+| Multiple Message Formats  |    ✅     | Data, Notification, Multicast               |
+| Unit Test & Mock Support  |    ✅     | Easy unit testing with mock client          |
+
+---
+
+## Supported Message Types
+
+| Type         | Description                                             |
+| ------------ | ------------------------------------------------------- |
+| Data         | Custom data messages, handled by the app                |
+| Notification | System notification messages, shown in notification bar |
+| Multicast    | Send to up to 500 device tokens at once                 |
+| Topic        | Send to all devices subscribed to a topic               |
+| Condition    | Send to devices matching a logical condition            |
+
+---
+
+## Quick Start
+
+Install go-fcm:
 
 ```bash
 go get github.com/appleboy/go-fcm
 ```
 
-## Provide credentials using ADC
+---
 
-Google Application Default Credentials (ADC) for Firebase projects support Google service accounts, which you can use to call Firebase server APIs from your app server or trusted environment. If you're developing code locally or deploying your application on-premises, you can use credentials obtained via this service account to authorize server requests.
+## Authentication and Credentials
 
-To authenticate a service account and authorize it to access Firebase services, you must generate a private key file in JSON format.
+It is recommended to use Google Application Default Credentials (ADC) for authentication.  
+Download the JSON key from [Firebase Console > Settings > Service Accounts][11] and set the environment variable:
 
-**To generate a private key file for your service account:**
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/serviceAccountKey.json"
+```
 
-1. In the Firebase console, open **Settings > [Service Accounts][11]**.
-2. Click **Generate New Private Key**, then confirm by clicking **Generate Key**.
-3. Securely store the JSON file containing the key.
-
-When authorizing via a service account, you have two choices for providing the credentials to your application. You can either set the **GOOGLE_APPLICATION_CREDENTIALS** environment variable, or you can explicitly pass the path to the service account key in code. The first option is more secure and is strongly recommended.
-
-See the more detail information [here][12].
+Alternatively, specify the key path directly in your code.
 
 [11]: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
-[12]: https://firebase.google.com/docs/cloud-messaging/auth-server#provide-credentials-using-adc
 
-## Usage
+---
 
-Here is a simple example illustrating how to use FCM library:
+## Usage Example
 
 ```go
 package main
@@ -63,7 +100,6 @@ func main() {
   client, err := fcm.NewClient(
     ctx,
     fcm.WithCredentialsFile("path/to/serviceAccountKey.json"),
-    // initial with service account
     // fcm.WithServiceAccount("my-client-id@my-project-id.iam.gserviceaccount.com"),
   )
   if err != nil {
@@ -71,7 +107,7 @@ func main() {
   }
 
   // Send to a single device
-  token := "test"
+  token := "YOUR_DEVICE_TOKEN"
   resp, err := client.Send(
     ctx,
     &messaging.Message{
@@ -84,13 +120,9 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
+  fmt.Println("Success:", resp.SuccessCount, "Failure:", resp.FailureCount)
 
-  fmt.Println("success count:", resp.SuccessCount)
-  fmt.Println("failure count:", resp.FailureCount)
-  fmt.Println("message id:", resp.Responses[0].MessageID)
-  fmt.Println("error msg:", resp.Responses[0].Error)
-
-  // Send to topic
+  // Send to a topic
   resp, err = client.Send(
     ctx,
     &messaging.Message{
@@ -105,11 +137,7 @@ func main() {
   }
 
   // Send with condition
-  // Define a condition which will send to devices which are subscribed
-  // to either the Google stock or the tech industry topics.
   condition := "'stock-GOOG' in topics || 'industry-tech' in topics"
-
-  // See documentation on defining a message payload.
   message := &messaging.Message{
     Data: map[string]string{
       "score": "850",
@@ -117,17 +145,12 @@ func main() {
     },
     Condition: condition,
   }
-
-  resp, err = client.Send(
-    ctx,
-    message,
-  )
+  resp, err = client.Send(ctx, message)
   if err != nil {
     log.Fatal(err)
   }
 
-  // Send multiple messages to device
-  // Create a list containing up to 500 messages.
+  // Send to multiple devices
   registrationToken := "YOUR_REGISTRATION_TOKEN"
   messages := []*messaging.Message{
     {
@@ -145,21 +168,16 @@ func main() {
       Topic: "readers-club",
     },
   }
-  resp, err = client.Send(
-    ctx,
-    messages...,
-  )
+  resp, err = client.Send(ctx, messages...)
   if err != nil {
     log.Fatal(err)
   }
 
-  // Send multicast message
-  // Create a list containing up to 500 registration tokens.
-  // This registration tokens come from the client FCM SDKs.
+  // Multicast messaging
   registrationTokens := []string{
     "YOUR_REGISTRATION_TOKEN_1",
+    "YOUR_REGISTRATION_TOKEN_2",
     // ...
-    "YOUR_REGISTRATION_TOKEN_n",
   }
   msg := &messaging.MulticastMessage{
     Data: map[string]string{
@@ -168,37 +186,41 @@ func main() {
     },
     Tokens: registrationTokens,
   }
-  resp, err = client.SendMulticast(
-    ctx,
-    msg,
-  )
+  resp, err = client.SendMulticast(ctx, msg)
   if err != nil {
     log.Fatal(err)
   }
-
   fmt.Printf("%d messages were sent successfully\n", resp.SuccessCount)
   if resp.FailureCount > 0 {
     var failedTokens []string
     for idx, resp := range resp.Responses {
       if !resp.Success {
-        // The order of responses corresponds to the order of the registration tokens.
         failedTokens = append(failedTokens, registrationTokens[idx])
       }
     }
-
     fmt.Printf("List of tokens that caused failures: %v\n", failedTokens)
   }
 }
 ```
 
+---
+
+## Advanced Configuration
+
 ### Custom HTTP Client
 
-You can use a custom HTTP client by passing it to the `NewClient` function:
-
 ```go
+import (
+  "crypto/tls"
+  "net"
+  "net/http"
+  "time"
+  "golang.org/x/net/http2"
+)
+
 func main() {
-  httpTimeout := time.Duration(5) * time.Second
-  tlsTimeout := time.Duration(5) * time.Second
+  httpTimeout := 5 * time.Second
+  tlsTimeout := 5 * time.Second
 
   transport := &http2.Transport{
     DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
@@ -220,9 +242,7 @@ func main() {
 }
 ```
 
-### Custom Proxy Server
-
-You can use a custom proxy server by passing it to the `NewClient` function:
+### Proxy Support
 
 ```go
 func main() {
@@ -235,18 +255,9 @@ func main() {
 }
 ```
 
-### Mock Client for Testing
-
-You can use a mock client for Unit Testing by initializing your `NewClient` with the following:
-
-* `fcm.WithEndpoint` with a local `httptest.NewServer` URL
-* `fcm.WithProjectID` any string
-* `fcm.WithServiceAccount` any string
-* `fcm.WithCustomClientOption` with option `option.WithoutAuthentication()`
+### Unit Testing and Mock
 
 ```go
-package main
-
 import (
   "context"
   "net/http"
@@ -262,9 +273,7 @@ func TestMockClient(t *testing.T) {
   server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     w.Header().Set("Content-Type", "application/json")
-    _, _ = w.Write([]byte(`{
-      "name": "q1w2e3r4"
-    }`))
+    _, _ = w.Write([]byte(`{"name": "q1w2e3r4"}`))
   }))
   defer server.Close()
 
@@ -288,15 +297,63 @@ func TestMockClient(t *testing.T) {
   if err != nil {
     t.Fatalf("unexpected error: %v", err)
   }
-  checkSuccessfulBatchResponseForSendEach(t, resp)
-}
-
-func checkSuccessfulBatchResponseForSendEach(t *testing.T, resp *messaging.BatchResponse) {
+  // Check response
   if resp.SuccessCount != 1 {
-    t.Fatalf("expected 1 successes\ngot: %d sucesses", resp.SuccessCount)
+    t.Fatalf("expected 1 successes, got: %d", resp.SuccessCount)
   }
   if resp.FailureCount != 0 {
-    t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)
+    t.Fatalf("expected 0 failures, got: %d", resp.FailureCount)
   }
 }
 ```
+
+---
+
+## Best Practices
+
+> [!TIP]
+>
+> - For batch messaging, limit each batch to no more than 500 tokens.
+> - Prefer using Topics to manage device groups instead of direct token management.
+> - Set your credentials file as read-only and store it securely.
+
+---
+
+## Troubleshooting
+
+| Error Code         | Possible Cause & Solution                      |
+| ------------------ | ---------------------------------------------- |
+| `UNREGISTERED`     | Token is invalid or expired, remove from DB    |
+| `INVALID_ARGUMENT` | Invalid message format, check your payload     |
+| `QUOTA_EXCEEDED`   | FCM quota exceeded, try again later            |
+| `UNAUTHORIZED`     | Invalid credentials, check your key and access |
+| `INTERNAL`         | FCM server error, retry the request            |
+
+---
+
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    A[Your Go Server] -->|go-fcm| B[FCM API]
+    B --> C[Android/iOS/Web Device]
+    B -.-> D[Topic/Condition Routing]
+```
+
+---
+
+## FAQ
+
+- Q: How do I obtain an FCM device token?
+- Q: How do I set up multi-language notifications?
+- Q: How do I track message delivery status?
+
+For more, see the [Firebase Official FAQ](https://firebase.google.com/support/faq/)
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
