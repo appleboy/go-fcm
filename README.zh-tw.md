@@ -6,61 +6,61 @@
 [![Lint and Testing](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/appleboy/go-fcm/actions/workflows/testing.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/go-fcm)](https://goreportcard.com/report/github.com/appleboy/go-fcm)
 
-> Forked from [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm)  
-> [Firebase Cloud Messaging Official Documentation](https://firebase.google.com/docs/cloud-messaging/)
+> 從 [github.com/edganiukov/fcm](https://github.com/edganiukov/fcm) 分支  
+> [Firebase 雲端訊息官方文件](https://firebase.google.com/docs/cloud-messaging/)
 
 ---
 
-## Table of Contents
+## 目錄
 
 - [go-fcm](#go-fcm)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Supported Message Types](#supported-message-types)
-  - [Quick Start](#quick-start)
-  - [Authentication and Credentials](#authentication-and-credentials)
-  - [Usage Example](#usage-example)
-  - [Advanced Configuration](#advanced-configuration)
-    - [Custom HTTP Client](#custom-http-client)
-    - [Proxy Support](#proxy-support)
-    - [Unit Testing and Mock](#unit-testing-and-mock)
-  - [Best Practices](#best-practices)
-  - [Troubleshooting](#troubleshooting)
-  - [Architecture Diagram](#architecture-diagram)
-  - [FAQ](#faq)
-  - [License](#license)
+  - [目錄](#目錄)
+  - [功能特色](#功能特色)
+  - [支援的訊息類型](#支援的訊息類型)
+  - [快速入門](#快速入門)
+  - [認證與憑證](#認證與憑證)
+  - [使用範例](#使用範例)
+  - [進階設定](#進階設定)
+    - [自訂 HTTP Client](#自訂-http-client)
+    - [代理伺服器支援](#代理伺服器支援)
+    - [單元測試與模擬](#單元測試與模擬)
+  - [最佳實踐](#最佳實踐)
+  - [疑難排解](#疑難排解)
+  - [架構圖](#架構圖)
+  - [常見問題](#常見問題)
+  - [授權條款](#授權條款)
 
 ---
 
-## Features
+## 功能特色
 
-| Feature                   | Supported | Description                                 |
-| ------------------------- | :-------: | ------------------------------------------- |
-| Single Device Messaging   |    ✅     | Send messages to a single device            |
-| Multiple Device Messaging |    ✅     | Send messages to multiple devices           |
-| Topic Messaging           |    ✅     | Send messages to a specific topic           |
-| Condition Messaging       |    ✅     | Support for FCM condition syntax            |
-| Custom HTTP Client        |    ✅     | Custom timeout, proxy, and transport config |
-| Multiple Message Formats  |    ✅     | Data, Notification, Multicast               |
-| Unit Test & Mock Support  |    ✅     | Easy unit testing with mock client          |
-
----
-
-## Supported Message Types
-
-| Type         | Description                                             |
-| ------------ | ------------------------------------------------------- |
-| Data         | Custom data messages, handled by the app                |
-| Notification | System notification messages, shown in notification bar |
-| Multicast    | Send to up to 500 device tokens at once                 |
-| Topic        | Send to all devices subscribed to a topic               |
-| Condition    | Send to devices matching a logical condition            |
+| 功能               | 支援 | 說明                           |
+| ------------------ | :--: | ------------------------------ |
+| 單一裝置推播       |  ✅  | 傳送訊息到單一裝置             |
+| 多裝置推播         |  ✅  | 傳送訊息到多個裝置             |
+| 主題推播           |  ✅  | 傳送訊息到特定主題             |
+| 條件推播           |  ✅  | 支援 FCM 條件語法              |
+| 自訂 HTTP Client   |  ✅  | 自訂逾時、代理、傳輸設定       |
+| 多種訊息格式       |  ✅  | Data、Notification、Multicast  |
+| 單元測試與模擬支援 |  ✅  | 方便的模擬 client 進行單元測試 |
 
 ---
 
-## Quick Start
+## 支援的訊息類型
 
-Install go-fcm:
+| 類型         | 說明                            |
+| ------------ | ------------------------------- |
+| Data         | 自訂資料訊息，由 App 處理       |
+| Notification | 系統通知訊息，顯示於通知欄      |
+| Multicast    | 一次傳送給最多 500 個裝置 token |
+| Topic        | 傳送給訂閱特定主題的所有裝置    |
+| Condition    | 傳送給符合邏輯條件的裝置        |
+
+---
+
+## 快速入門
+
+安裝 go-fcm：
 
 ```bash
 go get github.com/appleboy/go-fcm
@@ -68,22 +68,22 @@ go get github.com/appleboy/go-fcm
 
 ---
 
-## Authentication and Credentials
+## 認證與憑證
 
-It is recommended to use Google Application Default Credentials (ADC) for authentication.  
-Download the JSON key from [Firebase Console > Settings > Service Accounts][11] and set the environment variable:
+建議使用 Google Application Default Credentials (ADC) 進行認證。  
+請從 [Firebase 控制台 > 設定 > 服務帳戶][11] 下載 JSON 金鑰，並設定環境變數：
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="/path/to/serviceAccountKey.json"
 ```
 
-Alternatively, specify the key path directly in your code.
+或可於程式中直接指定金鑰路徑。
 
 [11]: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
 
 ---
 
-## Usage Example
+## 使用範例
 
 ```go
 package main
@@ -108,7 +108,7 @@ func main() {
     log.Fatal(err)
   }
 
-  // Send to a single device
+  // 傳送到單一裝置
   token := "YOUR_DEVICE_TOKEN"
   resp, err := client.Send(
     ctx,
@@ -122,9 +122,9 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
-  fmt.Println("Success:", resp.SuccessCount, "Failure:", resp.FailureCount)
+  fmt.Println("成功:", resp.SuccessCount, "失敗:", resp.FailureCount)
 
-  // Send to a topic
+  // 傳送到主題
   resp, err = client.Send(
     ctx,
     &messaging.Message{
@@ -138,7 +138,7 @@ func main() {
     log.Fatal(err)
   }
 
-  // Send with condition
+  // 條件推播
   condition := "'stock-GOOG' in topics || 'industry-tech' in topics"
   message := &messaging.Message{
     Data: map[string]string{
@@ -152,20 +152,20 @@ func main() {
     log.Fatal(err)
   }
 
-  // Send to multiple devices
+  // 多裝置推播
   registrationToken := "YOUR_REGISTRATION_TOKEN"
   messages := []*messaging.Message{
     {
       Notification: &messaging.Notification{
-        Title: "Price drop",
-        Body:  "5% off all electronics",
+        Title: "價格下跌",
+        Body:  "所有電子產品 5% 折扣",
       },
       Token: registrationToken,
     },
     {
       Notification: &messaging.Notification{
-        Title: "Price drop",
-        Body:  "2% off all books",
+        Title: "價格下跌",
+        Body:  "所有書籍 2% 折扣",
       },
       Topic: "readers-club",
     },
@@ -175,7 +175,7 @@ func main() {
     log.Fatal(err)
   }
 
-  // Multicast messaging
+  // Multicast 推播
   registrationTokens := []string{
     "YOUR_REGISTRATION_TOKEN_1",
     "YOUR_REGISTRATION_TOKEN_2",
@@ -192,7 +192,7 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
-  fmt.Printf("%d messages were sent successfully\n", resp.SuccessCount)
+  fmt.Printf("%d 則訊息傳送成功\n", resp.SuccessCount)
   if resp.FailureCount > 0 {
     var failedTokens []string
     for idx, resp := range resp.Responses {
@@ -200,16 +200,16 @@ func main() {
         failedTokens = append(failedTokens, registrationTokens[idx])
       }
     }
-    fmt.Printf("List of tokens that caused failures: %v\n", failedTokens)
+    fmt.Printf("失敗的 token 清單: %v\n", failedTokens)
   }
 }
 ```
 
 ---
 
-## Advanced Configuration
+## 進階設定
 
-### Custom HTTP Client
+### 自訂 HTTP Client
 
 ```go
 import (
@@ -244,7 +244,7 @@ func main() {
 }
 ```
 
-### Proxy Support
+### 代理伺服器支援
 
 ```go
 func main() {
@@ -257,7 +257,7 @@ func main() {
 }
 ```
 
-### Unit Testing and Mock
+### 單元測試與模擬
 
 ```go
 import (
@@ -286,7 +286,7 @@ func TestMockClient(t *testing.T) {
     fcm.WithCustomClientOption(option.WithoutAuthentication()),
   )
   if err != nil {
-    t.Fatalf("unexpected error: %v", err)
+    t.Fatalf("發生非預期錯誤: %v", err)
   }
   resp, err := client.Send(
     context.Background(),
@@ -297,65 +297,65 @@ func TestMockClient(t *testing.T) {
       },
     })
   if err != nil {
-    t.Fatalf("unexpected error: %v", err)
+    t.Fatalf("發生非預期錯誤: %v", err)
   }
-  // Check response
+  // 檢查回應
   if resp.SuccessCount != 1 {
-    t.Fatalf("expected 1 successes, got: %d", resp.SuccessCount)
+    t.Fatalf("預期 1 成功，實際: %d", resp.SuccessCount)
   }
   if resp.FailureCount != 0 {
-    t.Fatalf("expected 0 failures, got: %d", resp.FailureCount)
+    t.Fatalf("預期 0 失敗，實際: %d", resp.FailureCount)
   }
 }
 ```
 
 ---
 
-## Best Practices
+## 最佳實踐
 
 > [!TIP]
 >
-> - For batch messaging, limit each batch to no more than 500 tokens.
-> - Prefer using Topics to manage device groups instead of direct token management.
-> - Set your credentials file as read-only and store it securely.
+> - 批次推播時，每批建議不超過 500 個 token。
+> - 建議使用主題管理裝置群組，避免直接管理 token。
+> - 憑證檔案請設為唯讀並妥善保存。
 
 ---
 
-## Troubleshooting
+## 疑難排解
 
-| Error Code         | Possible Cause & Solution                      |
-| ------------------ | ---------------------------------------------- |
-| `UNREGISTERED`     | Token is invalid or expired, remove from DB    |
-| `INVALID_ARGUMENT` | Invalid message format, check your payload     |
-| `QUOTA_EXCEEDED`   | FCM quota exceeded, try again later            |
-| `UNAUTHORIZED`     | Invalid credentials, check your key and access |
-| `INTERNAL`         | FCM server error, retry the request            |
+| 錯誤代碼           | 可能原因與解決方式               |
+| ------------------ | -------------------------------- |
+| `UNREGISTERED`     | Token 無效或過期，請從資料庫移除 |
+| `INVALID_ARGUMENT` | 訊息格式錯誤，請檢查 payload     |
+| `QUOTA_EXCEEDED`   | FCM 配額已滿，請稍後再試         |
+| `UNAUTHORIZED`     | 憑證無效，請檢查金鑰與存取權限   |
+| `INTERNAL`         | FCM 伺服器錯誤，請重試請求       |
 
 ---
 
-## Architecture Diagram
+## 架構圖
 
 ```mermaid
 flowchart TD
-    A[Your Go Server] -->|go-fcm| B[FCM API]
-    B --> C[Android/iOS/Web Device]
-    B -.-> D[Topic/Condition Routing]
+    A[你的 Go 伺服器] -->|go-fcm| B[FCM API]
+    B --> C[Android/iOS/Web 裝置]
+    B -.-> D[主題/條件路由]
 ```
 
 ---
 
-## FAQ
+## 常見問題
 
-- Q: How do I obtain an FCM device token?
-- Q: How do I set up multi-language notifications?
-- Q: How do I track message delivery status?
+- 問：如何取得 FCM 裝置 token？
+- 問：如何設定多語系通知？
+- 問：如何追蹤訊息傳遞狀態？
 
-For more, see the [Firebase Official FAQ](https://firebase.google.com/support/faq/)
+更多請參考 [Firebase 官方 FAQ](https://firebase.google.com/support/faq/)
 
 ---
 
-## License
+## 授權條款
 
-This project is licensed under the [MIT License](LICENSE).
+本專案採用 [MIT License](LICENSE) 授權。
 
 ---
