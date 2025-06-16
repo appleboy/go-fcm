@@ -3,7 +3,7 @@ module github.com/appleboy/go-fcm
 go 1.24
 
 require (
-	firebase.google.com/go/v4 v4.16.0
+	firebase.google.com/go/v4 v4.16.1
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/api v0.236.0
 )
