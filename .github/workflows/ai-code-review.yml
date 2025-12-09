@@ -1,0 +1,110 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        id: diff
+        run: |
+          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD)
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: AI Code Review
+        id: review
+        uses: appleboy/llm-action@v1
+        with:
+          api_key: ${{ secrets.OPENAI_API_KEY }}
+          model: gpt-4o
+          system_prompt: |
+            你是一位資深的程式碼審查專家。請根據以下標準審查程式碼：
+            1. 程式碼品質與可讀性
+            2. 潛在的 Bug 或安全漏洞
+            3. 效能問題
+            4. 最佳實踐建議
+          input_prompt: |
+            請審查以下 Pull Request 的程式碼變更：
+
+            ${{ steps.diff.outputs.diff }}
+          tool_schema: |
+            {
+              "name": "code_review",
+              "description": "程式碼審查結果",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "score": {
+                    "type": "string",
+                    "description": "評分 1-10，10 為最佳"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "description": "審查摘要，50 字以內"
+                  },
+                  "issues": {
+                    "type": "string",
+                    "description": "發現的問題，以 markdown 列表格式"
+                  },
+                  "suggestions": {
+                    "type": "string",
+                    "description": "改善建議，以 markdown 列表格式"
+                  },
+                  "approved": {
+                    "type": "string",
+                    "description": "是否建議合併：yes 或 no"
+                  }
+                },
+                "required": ["score", "summary", "issues", "suggestions", "approved"]
+              }
+            }
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = '${{ steps.review.outputs.score }}';
+            const summary = '${{ steps.review.outputs.summary }}';
+            const issues = '${{ steps.review.outputs.issues }}';
+            const suggestions = '${{ steps.review.outputs.suggestions }}';
+            const approved = '${{ steps.review.outputs.approved }}';
+
+            const emoji = approved === 'yes' ? '✅' : '⚠️';
+
+            const body = `## ${emoji} AI Code Review 結果
+
+            **評分：** ${score}/10
+
+            **摘要：** ${summary}
+
+            ### 🔍 發現的問題
+            ${issues || '無'}
+
+            ### 💡 改善建議
+            ${suggestions || '無'}
+
+            ---
+            *此審查由 AI 自動產生，僅供參考*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Set review status
+        if: steps.review.outputs.approved == 'no'
+        run: |
+          echo "::warning::AI 審查建議：此 PR 需要進一步修改"
+          exit 1
