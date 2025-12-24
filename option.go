@@ -46,7 +46,7 @@ func WithCredentialsFile(filename string) Option {
 			return fmt.Errorf("cannot read credentials file: %v", err)
 		}
 		c.credentialsJSON = data
-		c.options = append(c.options, option.WithCredentialsJSON(data))
+		c.options = append(c.options, option.WithAuthCredentialsJSON(option.ServiceAccount, data))
 		return nil
 	}
 }
@@ -57,7 +57,7 @@ func WithCredentialsFile(filename string) Option {
 func WithCredentialsJSON(data []byte) Option {
 	return func(c *Client) error {
 		c.credentialsJSON = data
-		c.options = append(c.options, option.WithCredentialsJSON(data))
+		c.options = append(c.options, option.WithAuthCredentialsJSON(option.ServiceAccount, data))
 		return nil
 	}
 }
