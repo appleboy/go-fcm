@@ -108,7 +108,10 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 // unavailability. A non-nil error is returned if a non-recoverable error
 // occurs (i.e. if the response status is not "200 OK").
 // Behaves just like regular send, but uses external context.
-func (c *Client) Send(ctx context.Context, message ...*messaging.Message) (*messaging.BatchResponse, error) {
+func (c *Client) Send(
+	ctx context.Context,
+	message ...*messaging.Message,
+) (*messaging.BatchResponse, error) {
 	resp, err := c.client.SendEach(ctx, message)
 	if err != nil {
 		return nil, err
@@ -119,7 +122,10 @@ func (c *Client) Send(ctx context.Context, message ...*messaging.Message) (*mess
 
 // SendDryRun sends the messages in the given array via Firebase Cloud Messaging in the
 // dry run (validation only) mode.
-func (c *Client) SendDryRun(ctx context.Context, message ...*messaging.Message) (*messaging.BatchResponse, error) {
+func (c *Client) SendDryRun(
+	ctx context.Context,
+	message ...*messaging.Message,
+) (*messaging.BatchResponse, error) {
 	resp, err := c.client.SendEachDryRun(ctx, message)
 	if err != nil {
 		return nil, err
@@ -129,7 +135,10 @@ func (c *Client) SendDryRun(ctx context.Context, message ...*messaging.Message) 
 }
 
 // SendEachForMulticast sends the given multicast message to all the FCM registration tokens specified.
-func (c *Client) SendMulticast(ctx context.Context, message *messaging.MulticastMessage) (*messaging.BatchResponse, error) {
+func (c *Client) SendMulticast(
+	ctx context.Context,
+	message *messaging.MulticastMessage,
+) (*messaging.BatchResponse, error) {
 	resp, err := c.client.SendEachForMulticast(ctx, message)
 	if err != nil {
 		return nil, err
@@ -140,7 +149,10 @@ func (c *Client) SendMulticast(ctx context.Context, message *messaging.Multicast
 
 // SendEachForMulticastDryRun sends the given multicast message to all the specified FCM registration
 // tokens in the dry run (validation only) mode.
-func (c *Client) SendMulticastDryRun(ctx context.Context, message *messaging.MulticastMessage) (*messaging.BatchResponse, error) {
+func (c *Client) SendMulticastDryRun(
+	ctx context.Context,
+	message *messaging.MulticastMessage,
+) (*messaging.BatchResponse, error) {
 	resp, err := c.client.SendEachForMulticastDryRun(ctx, message)
 	if err != nil {
 		return nil, err
@@ -152,7 +164,11 @@ func (c *Client) SendMulticastDryRun(ctx context.Context, message *messaging.Mul
 // SubscribeToTopic subscribes a list of registration tokens to a topic.
 //
 // The tokens list must not be empty, and have at most 1000 tokens.
-func (c *Client) SubscribeTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+func (c *Client) SubscribeTopic(
+	ctx context.Context,
+	tokens []string,
+	topic string,
+) (*messaging.TopicManagementResponse, error) {
 	resp, err := c.client.SubscribeToTopic(ctx, tokens, topic)
 	if err != nil {
 		return nil, err
@@ -164,7 +180,11 @@ func (c *Client) SubscribeTopic(ctx context.Context, tokens []string, topic stri
 // UnsubscribeFromTopic unsubscribes a list of registration tokens from a topic.
 //
 // The tokens list must not be empty, and have at most 1000 tokens.
-func (c *Client) UnsubscribeTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+func (c *Client) UnsubscribeTopic(
+	ctx context.Context,
+	tokens []string,
+	topic string,
+) (*messaging.TopicManagementResponse, error) {
 	resp, err := c.client.UnsubscribeFromTopic(ctx, tokens, topic)
 	if err != nil {
 		return nil, err
