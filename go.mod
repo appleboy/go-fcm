@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	firebase.google.com/go/v4 v4.19.0
-	golang.org/x/oauth2 v0.34.0
+	golang.org/x/oauth2 v0.35.0
 	google.golang.org/api v0.263.0
 )
 
