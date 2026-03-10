@@ -73,7 +73,9 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 
 	if c.httpClient != nil {
 		ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, c.httpClient)
-		creds, err := google.CredentialsFromJSONWithType(ctxWithClient, c.credentialsJSON, google.ServiceAccount, scopes...)
+		creds, err := google.CredentialsFromJSONWithType(
+			ctxWithClient, c.credentialsJSON, google.ServiceAccount, scopes...,
+		)
 		if err != nil {
 			return nil, err
 		}
