@@ -15,7 +15,8 @@ func (d debugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%s", string(reqDump)) //nolint:gosec
+	//nolint:gosec // debug-only HTTP dump
+	log.Printf("%s", string(reqDump))
 
 	resp, err := d.t.RoundTrip(req)
 	if err != nil {
@@ -29,6 +30,7 @@ func (d debugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		}
 		return nil, err
 	}
-	log.Printf("%s", string(respDump)) //nolint:gosec
+	//nolint:gosec // debug-only HTTP dump
+	log.Printf("%s", string(respDump))
 	return resp, nil
 }
