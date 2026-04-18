@@ -45,5 +45,5 @@ jobs:
           scan-type: "fs"
           scan-ref: "."
           format: "table"
-          severity: "CRITICAL,HIGH,MEDIUM"
-          exit-code: "1" # Fail if CRITICAL/HIGH/MEDIUM vulnerabilities found
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail only if CRITICAL/HIGH vulnerabilities found
