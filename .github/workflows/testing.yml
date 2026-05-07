@@ -6,18 +6,22 @@ on:
 
 jobs:
   lint:
+    strategy:
+      matrix:
+        go: [1.25, 1.26]
     runs-on: ubuntu-latest
+    name: lint @ Go ${{ matrix.go }}
     steps:
       - name: Setup go
         uses: actions/setup-go@v6
         with:
-          go-version: "^1"
+          go-version: ${{ matrix.go }}
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.11
+          version: v2.12
           args: --verbose
 
       # This step uses the Bearer GitHub Action to scan for sensitive data in the codebase.
