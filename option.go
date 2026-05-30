@@ -45,8 +45,7 @@ func WithCredentialsFile(filename string) Option {
 		if err != nil {
 			return fmt.Errorf("cannot read credentials file: %v", err)
 		}
-		c.credentialsJSON = data
-		c.options = append(c.options, option.WithAuthCredentialsJSON(option.ServiceAccount, data))
+		c.setCredentials(data)
 		return nil
 	}
 }
@@ -56,10 +55,16 @@ func WithCredentialsFile(filename string) Option {
 // credentials.
 func WithCredentialsJSON(data []byte) Option {
 	return func(c *Client) error {
-		c.credentialsJSON = data
-		c.options = append(c.options, option.WithAuthCredentialsJSON(option.ServiceAccount, data))
+		c.setCredentials(data)
 		return nil
 	}
+}
+
+// setCredentials stores the raw credentials JSON and registers it as a
+// Firebase client option.
+func (c *Client) setCredentials(data []byte) {
+	c.credentialsJSON = data
+	c.options = append(c.options, option.WithAuthCredentialsJSON(option.ServiceAccount, data))
 }
 
 // WithEndpoint returns Option to configure endpoint.
@@ -73,7 +78,7 @@ func WithEndpoint(endpoint string) Option {
 // WithServiceAccount returns Option to configure service account.
 func WithServiceAccount(serviceAccount string) Option {
 	return func(c *Client) error {
-		c.serviceAcount = serviceAccount
+		c.serviceAccount = serviceAccount
 		return nil
 	}
 }
