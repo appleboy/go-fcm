@@ -30,7 +30,7 @@ var scopes = []string{
 // - https://www.googleapis.com/auth/firebase.messaging
 type Client struct {
 	client          *messaging.Client
-	serviceAcount   string
+	serviceAccount  string
 	projectID       string
 	options         []option.ClientOption
 	httpClient      *http.Client
@@ -50,25 +50,22 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	}
 
 	var conf *firebase.Config
-	if c.serviceAcount != "" || c.projectID != "" {
+	if c.serviceAccount != "" || c.projectID != "" {
 		conf = &firebase.Config{
-			ServiceAccountID: c.serviceAcount,
+			ServiceAccountID: c.serviceAccount,
 			ProjectID:        c.projectID,
 		}
 	}
 
 	if c.debug {
 		if c.httpClient == nil {
-			c.httpClient = &http.Client{
-				Transport: debugTransport{
-					t: http.DefaultTransport,
-				},
-			}
-		} else {
-			c.httpClient.Transport = debugTransport{
-				t: c.httpClient.Transport,
-			}
+			c.httpClient = &http.Client{}
 		}
+		base := c.httpClient.Transport
+		if base == nil {
+			base = http.DefaultTransport
+		}
+		c.httpClient.Transport = debugTransport{t: base}
 	}
 
 	if c.httpClient != nil {
@@ -106,20 +103,14 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	return c, nil
 }
 
-// SendWithContext sends a message to the FCM server without retrying in case of service
+// Send sends a message to the FCM server without retrying in case of service
 // unavailability. A non-nil error is returned if a non-recoverable error
 // occurs (i.e. if the response status is not "200 OK").
-// Behaves just like regular send, but uses external context.
 func (c *Client) Send(
 	ctx context.Context,
 	message ...*messaging.Message,
 ) (*messaging.BatchResponse, error) {
-	resp, err := c.client.SendEach(ctx, message)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.SendEach(ctx, message)
 }
 
 // SendDryRun sends the messages in the given array via Firebase Cloud Messaging in the
@@ -128,42 +119,27 @@ func (c *Client) SendDryRun(
 	ctx context.Context,
 	message ...*messaging.Message,
 ) (*messaging.BatchResponse, error) {
-	resp, err := c.client.SendEachDryRun(ctx, message)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.SendEachDryRun(ctx, message)
 }
 
-// SendEachForMulticast sends the given multicast message to all the FCM registration tokens specified.
+// SendMulticast sends the given multicast message to all the FCM registration tokens specified.
 func (c *Client) SendMulticast(
 	ctx context.Context,
 	message *messaging.MulticastMessage,
 ) (*messaging.BatchResponse, error) {
-	resp, err := c.client.SendEachForMulticast(ctx, message)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.SendEachForMulticast(ctx, message)
 }
 
-// SendEachForMulticastDryRun sends the given multicast message to all the specified FCM registration
+// SendMulticastDryRun sends the given multicast message to all the specified FCM registration
 // tokens in the dry run (validation only) mode.
 func (c *Client) SendMulticastDryRun(
 	ctx context.Context,
 	message *messaging.MulticastMessage,
 ) (*messaging.BatchResponse, error) {
-	resp, err := c.client.SendEachForMulticastDryRun(ctx, message)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.SendEachForMulticastDryRun(ctx, message)
 }
 
-// SubscribeToTopic subscribes a list of registration tokens to a topic.
+// SubscribeTopic subscribes a list of registration tokens to a topic.
 //
 // The tokens list must not be empty, and have at most 1000 tokens.
 func (c *Client) SubscribeTopic(
@@ -171,15 +147,10 @@ func (c *Client) SubscribeTopic(
 	tokens []string,
 	topic string,
 ) (*messaging.TopicManagementResponse, error) {
-	resp, err := c.client.SubscribeToTopic(ctx, tokens, topic)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.SubscribeToTopic(ctx, tokens, topic)
 }
 
-// UnsubscribeFromTopic unsubscribes a list of registration tokens from a topic.
+// UnsubscribeTopic unsubscribes a list of registration tokens from a topic.
 //
 // The tokens list must not be empty, and have at most 1000 tokens.
 func (c *Client) UnsubscribeTopic(
@@ -187,10 +158,5 @@ func (c *Client) UnsubscribeTopic(
 	tokens []string,
 	topic string,
 ) (*messaging.TopicManagementResponse, error) {
-	resp, err := c.client.UnsubscribeFromTopic(ctx, tokens, topic)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return c.client.UnsubscribeFromTopic(ctx, tokens, topic)
 }
