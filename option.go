@@ -43,7 +43,7 @@ func WithCredentialsFile(filename string) Option {
 	return func(c *Client) error {
 		data, err := os.ReadFile(filename)
 		if err != nil {
-			return fmt.Errorf("cannot read credentials file: %v", err)
+			return fmt.Errorf("cannot read credentials file: %w", err)
 		}
 		c.setCredentials(data)
 		return nil
@@ -95,6 +95,7 @@ func WithProjectID(projectID string) Option {
 // source to be used as the basis for authentication.
 func WithTokenSource(s oauth2.TokenSource) Option {
 	return func(c *Client) error {
+		c.tokenSource = s
 		c.options = append(c.options, option.WithTokenSource(s))
 		return nil
 	}

@@ -3,7 +3,6 @@ package fcm
 import (
 	"context"
 	"net/http"
-	"time"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
@@ -17,13 +16,14 @@ var scopes = []string{
 }
 
 // Client abstracts the interaction between the application server and the
-// FCM server via HTTP protocol. The developer must obtain an API key from the
-// Google APIs Console page and pass it to the `Client` so that it can
-// perform authorized requests on the application server's behalf.
-// To send a message to one or more devices use the Client's Send.
+// FCM server via the Firebase Cloud Messaging HTTP v1 API. Authenticate it with
+// service-account credentials (WithCredentialsFile / WithCredentialsJSON) or an
+// OAuth2 token source (WithTokenSource) so that it can perform authorized
+// requests on the application server's behalf. To send a message to one or more
+// devices use the Client's Send method.
 //
-// If the `HTTP` field is nil, a zeroed http.Client will be allocated and used
-// to send messages.
+// By default requests use a standard http.Client; supply your own with
+// WithHTTPClient or route through a proxy with WithHTTPProxy.
 //
 // Authorization Scopes
 // Requires one of the following OAuth scopes:
@@ -34,14 +34,14 @@ type Client struct {
 	projectID       string
 	options         []option.ClientOption
 	httpClient      *http.Client
+	tokenSource     oauth2.TokenSource
 	credentialsJSON []byte // credentialsJSON is the JSON representation of the service account credentials.
 	debug           bool
 }
 
-// NewClient creates new Firebase Cloud Messaging Client based on API key and
-// with default endpoint and http client.
+// NewClient creates a new Firebase Cloud Messaging Client, applying the given
+// options and using the default endpoint and http client unless overridden.
 func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
-	var err error
 	c := &Client{}
 	for _, o := range opts {
 		if err := o(c); err != nil {
@@ -57,37 +57,51 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 		}
 	}
 
-	if c.debug {
-		if c.httpClient == nil {
-			c.httpClient = &http.Client{}
+	// Route Firebase API calls through a custom transport when the caller
+	// supplied an http.Client, a proxy, or enabled debug logging. Because
+	// option.WithHTTPClient bypasses the SDK's own auth wiring, re-apply the
+	// selected credentials (service-account JSON or an explicit token source)
+	// on top of that transport so debug/proxy stays compatible with every auth
+	// method, not just inline JSON.
+	if c.httpClient != nil || c.debug {
+		base := http.DefaultTransport
+		if c.httpClient != nil && c.httpClient.Transport != nil {
+			base = c.httpClient.Transport
 		}
-		base := c.httpClient.Transport
-		if base == nil {
-			base = http.DefaultTransport
-		}
-		c.httpClient.Transport = debugTransport{t: base}
-	}
-
-	if c.httpClient != nil {
-		ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, c.httpClient)
-		creds, err := google.CredentialsFromJSONWithType(
-			ctxWithClient, c.credentialsJSON, google.ServiceAccount, scopes...,
-		)
-		if err != nil {
-			return nil, err
+		if c.debug {
+			base = debugTransport{t: base}
 		}
 
-		// And this is how we insert proxy for the Firebase calls. Initialize base transport with our proxy.
-		tr := &oauth2.Transport{
-			Source: creds.TokenSource,
-			Base:   c.httpClient.Transport,
+		var src oauth2.TokenSource
+		switch {
+		case len(c.credentialsJSON) > 0:
+			tokenClient := &http.Client{Transport: base}
+			ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, tokenClient)
+			creds, err := google.CredentialsFromJSONWithType(
+				ctxWithClient, c.credentialsJSON, google.ServiceAccount, scopes...,
+			)
+			if err != nil {
+				return nil, err
+			}
+			src = creds.TokenSource
+		case c.tokenSource != nil:
+			src = c.tokenSource
 		}
 
-		hCl := &http.Client{
-			Transport: tr,
-			Timeout:   10 * time.Second,
+		transport := base
+		if src != nil {
+			transport = &oauth2.Transport{Source: src, Base: base}
 		}
-		c.options = append(c.options, option.WithHTTPClient(hCl))
+
+		// Replace only the transport; preserve the caller's other client
+		// settings instead of discarding them behind a hardcoded timeout.
+		httpClient := &http.Client{Transport: transport}
+		if c.httpClient != nil {
+			httpClient.Timeout = c.httpClient.Timeout
+			httpClient.CheckRedirect = c.httpClient.CheckRedirect
+			httpClient.Jar = c.httpClient.Jar
+		}
+		c.options = append(c.options, option.WithHTTPClient(httpClient))
 	}
 
 	app, err := firebase.NewApp(ctx, conf, c.options...)
@@ -103,9 +117,12 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	return c, nil
 }
 
-// Send sends a message to the FCM server without retrying in case of service
-// unavailability. A non-nil error is returned if a non-recoverable error
-// occurs (i.e. if the response status is not "200 OK").
+// Send delivers one or more messages to the FCM server, sending each message in
+// its own request via SendEach. The returned BatchResponse reports the outcome
+// of every message in resp.Responses together with SuccessCount/FailureCount; a
+// non-nil error is returned only when the batch as a whole cannot be sent, not
+// when individual messages fail, so callers must inspect the response to detect
+// per-message errors.
 func (c *Client) Send(
 	ctx context.Context,
 	message ...*messaging.Message,

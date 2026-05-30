@@ -159,3 +159,75 @@ func checkSuccessfulBatchResponseForSendEach(t *testing.T, resp *messaging.Batch
 		t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)
 	}
 }
+
+// TestTransportAuthCombos verifies that attaching a custom transport (debug
+// logging or a custom http.Client) stays compatible with the non-JSON auth
+// methods. Previously these combinations forced a service-account-JSON path and
+// failed at construction with "unexpected end of JSON input".
+func TestTransportAuthCombos(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"name": "q1w2e3r4"}`))
+	}))
+	defer server.Close()
+
+	msg := &messaging.Message{
+		Token: "test",
+		Data:  map[string]string{"foo": "bar"},
+	}
+
+	t.Run("debug with token source", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "test-token"}),
+			WithDebug(true),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.Send(context.Background(), msg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+	})
+
+	t.Run("debug without authentication", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithCustomClientOption(option.WithoutAuthentication()),
+			WithDebug(true),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.Send(context.Background(), msg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+	})
+
+	t.Run("custom http client with token source", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "test-token"}),
+			WithHTTPClient(&http.Client{}),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		resp, err := client.Send(context.Background(), msg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+	})
+}

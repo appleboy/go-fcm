@@ -1,1 +1,49 @@
 package fcm
+
+import (
+	"errors"
+	"io/fs"
+	"testing"
+
+	"google.golang.org/api/option"
+)
+
+func TestWithHTTPProxyInvalidURL(t *testing.T) {
+	c := &Client{}
+	if err := WithHTTPProxy("http://\x7f")(c); err == nil {
+		t.Fatal("expected error for invalid proxy URL, got nil")
+	}
+}
+
+func TestWithCredentialsFileMissingWrapsError(t *testing.T) {
+	c := &Client{}
+	err := WithCredentialsFile("does-not-exist.json")(c)
+	if err == nil {
+		t.Fatal("expected error for missing credentials file, got nil")
+	}
+	// The %w wrapping must preserve the underlying os error so callers can
+	// classify it with errors.Is.
+	if !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("expected error wrapping fs.ErrNotExist, got: %v", err)
+	}
+}
+
+func TestWithCustomClientOptionEmptyIsNoop(t *testing.T) {
+	c := &Client{}
+	if err := WithCustomClientOption()(c); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(c.options) != 0 {
+		t.Fatalf("expected no options appended, got %d", len(c.options))
+	}
+}
+
+func TestWithCustomClientOptionAppends(t *testing.T) {
+	c := &Client{}
+	if err := WithCustomClientOption(option.WithoutAuthentication())(c); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(c.options) != 1 {
+		t.Fatalf("expected 1 option appended, got %d", len(c.options))
+	}
+}
