@@ -17,10 +17,11 @@ var scopes = []string{
 
 // Client abstracts the interaction between the application server and the
 // FCM server via the Firebase Cloud Messaging HTTP v1 API. Authenticate it with
-// service-account credentials (WithCredentialsFile / WithCredentialsJSON) or an
-// OAuth2 token source (WithTokenSource) so that it can perform authorized
-// requests on the application server's behalf. To send a message to one or more
-// devices use the Client's Send method.
+// service-account credentials (WithCredentialsFile / WithCredentialsJSON), an
+// OAuth2 token source (WithTokenSource), or Google Application Default
+// Credentials so that it can perform authorized requests on the application
+// server's behalf. To send a message to one or more devices use the Client's
+// Send method.
 //
 // By default requests use a standard http.Client; supply your own with
 // WithHTTPClient or route through a proxy with WithHTTPProxy.
@@ -72,11 +73,24 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 			base = debugTransport{t: base}
 		}
 
+		// newHTTPClient wraps the given transport while preserving the caller's
+		// other client settings (timeout, cookie jar, redirect policy) instead
+		// of discarding them. It is reused for both the credential token fetch
+		// and the final FCM client so neither silently drops those settings.
+		newHTTPClient := func(rt http.RoundTripper) *http.Client {
+			hc := &http.Client{Transport: rt}
+			if c.httpClient != nil {
+				hc.Timeout = c.httpClient.Timeout
+				hc.CheckRedirect = c.httpClient.CheckRedirect
+				hc.Jar = c.httpClient.Jar
+			}
+			return hc
+		}
+
 		var src oauth2.TokenSource
 		switch {
 		case len(c.credentialsJSON) > 0:
-			tokenClient := &http.Client{Transport: base}
-			ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, tokenClient)
+			ctxWithClient := context.WithValue(ctx, oauth2.HTTPClient, newHTTPClient(base))
 			creds, err := google.CredentialsFromJSONWithType(
 				ctxWithClient, c.credentialsJSON, google.ServiceAccount, scopes...,
 			)
@@ -93,15 +107,7 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 			transport = &oauth2.Transport{Source: src, Base: base}
 		}
 
-		// Replace only the transport; preserve the caller's other client
-		// settings instead of discarding them behind a hardcoded timeout.
-		httpClient := &http.Client{Transport: transport}
-		if c.httpClient != nil {
-			httpClient.Timeout = c.httpClient.Timeout
-			httpClient.CheckRedirect = c.httpClient.CheckRedirect
-			httpClient.Jar = c.httpClient.Jar
-		}
-		c.options = append(c.options, option.WithHTTPClient(httpClient))
+		c.options = append(c.options, option.WithHTTPClient(newHTTPClient(transport)))
 	}
 
 	app, err := firebase.NewApp(ctx, conf, c.options...)

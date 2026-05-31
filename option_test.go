@@ -3,6 +3,7 @@ package fcm
 import (
 	"errors"
 	"io/fs"
+	"path/filepath"
 	"testing"
 
 	"google.golang.org/api/option"
@@ -17,7 +18,10 @@ func TestWithHTTPProxyInvalidURL(t *testing.T) {
 
 func TestWithCredentialsFileMissingWrapsError(t *testing.T) {
 	c := &Client{}
-	err := WithCredentialsFile("does-not-exist.json")(c)
+	// Use a path under the test's temp dir so non-existence is guaranteed
+	// regardless of the working directory.
+	missing := filepath.Join(t.TempDir(), "does-not-exist.json")
+	err := WithCredentialsFile(missing)(c)
 	if err == nil {
 		t.Fatal("expected error for missing credentials file, got nil")
 	}
