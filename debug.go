@@ -13,6 +13,11 @@ type debugTransport struct {
 func (d debugTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	reqDump, err := httputil.DumpRequest(req, true)
 	if err != nil {
+		// RoundTrip must always close the request body, including on errors,
+		// before returning without delegating to the wrapped transport.
+		if req.Body != nil {
+			_ = req.Body.Close()
+		}
 		return nil, err
 	}
 	//nolint:gosec // debug-only HTTP dump

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"firebase.google.com/go/v4/messaging"
@@ -158,4 +159,95 @@ func checkSuccessfulBatchResponseForSendEach(t *testing.T, resp *messaging.Batch
 	if resp.FailureCount != 0 {
 		t.Fatalf("expected 0 failures\ngot: %d failures", resp.FailureCount)
 	}
+}
+
+// TestTransportAuthCombos verifies that attaching a custom transport (debug
+// logging or a custom http.Client) stays compatible with the non-JSON auth
+// methods. Previously these combinations forced a service-account-JSON path and
+// failed at construction with "unexpected end of JSON input".
+func TestTransportAuthCombos(t *testing.T) {
+	var (
+		mu      sync.Mutex
+		gotAuth string
+	)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		gotAuth = r.Header.Get("Authorization")
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"name": "q1w2e3r4"}`))
+	}))
+	defer server.Close()
+
+	msg := &messaging.Message{
+		Token: "test",
+		Data:  map[string]string{"foo": "bar"},
+	}
+
+	// sendAndCheck sends one message, asserts a successful batch response, and
+	// returns the Authorization header the server observed so callers can verify
+	// the auth transport actually attached (or omitted) the bearer token.
+	sendAndCheck := func(t *testing.T, client *Client) string {
+		t.Helper()
+		mu.Lock()
+		gotAuth = ""
+		mu.Unlock()
+		resp, err := client.Send(context.Background(), msg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		checkSuccessfulBatchResponseForSendEach(t, resp)
+		mu.Lock()
+		defer mu.Unlock()
+		return gotAuth
+	}
+
+	t.Run("debug with token source", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "test-token"}),
+			WithDebug(true),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if auth := sendAndCheck(t, client); auth != "Bearer test-token" {
+			t.Fatalf("expected bearer token to be attached, got %q", auth)
+		}
+	})
+
+	t.Run("debug without authentication", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithCustomClientOption(option.WithoutAuthentication()),
+			WithDebug(true),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if auth := sendAndCheck(t, client); auth != "" {
+			t.Fatalf("expected no Authorization header, got %q", auth)
+		}
+	})
+
+	t.Run("custom http client with token source", func(t *testing.T) {
+		client, err := NewClient(
+			context.Background(),
+			WithEndpoint(server.URL),
+			WithProjectID("test"),
+			WithTokenSource(&MockTokenSource{AccessToken: "test-token"}),
+			WithHTTPClient(&http.Client{}),
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if auth := sendAndCheck(t, client); auth != "Bearer test-token" {
+			t.Fatalf("expected bearer token to be attached, got %q", auth)
+		}
+	})
 }
