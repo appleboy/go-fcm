@@ -48,7 +48,8 @@ func TestSendEach(t *testing.T) {
 				Data: map[string]string{
 					"foo": "bar",
 				},
-			})
+			},
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -61,7 +62,8 @@ func TestSendEach(t *testing.T) {
 				Data: map[string]string{
 					"foo": "bar",
 				},
-			})
+			},
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -107,7 +109,8 @@ func TestSendEach(t *testing.T) {
 				Data: map[string]string{
 					"foo": "bar",
 				},
-			})
+			},
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -120,7 +123,8 @@ func TestSendEach(t *testing.T) {
 				Data: map[string]string{
 					"foo": "bar",
 				},
-			})
+			},
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -144,7 +148,8 @@ func TestSendEach(t *testing.T) {
 				Data: map[string]string{
 					"foo": "bar",
 				},
-			})
+			},
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
